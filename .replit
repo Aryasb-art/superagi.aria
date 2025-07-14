@@ -1,0 +1,9 @@
+modules = ["python-3.12", "nodejs-20", "web", "bash"]
+run = "python main.py"
+
+[nix]
+channel = "stable-24_05"
+packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
+
+[deployment]
+run = ["sh", "-c", "python main.py"]
