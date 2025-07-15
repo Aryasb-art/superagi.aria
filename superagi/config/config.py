@@ -43,8 +43,12 @@ class Config(BaseSettings):
         return self.dict().get(key, default)
 
 
-ROOT_DIR = os.path.dirname(Path(__file__).parent.parent)
-_config_instance = Config(ROOT_DIR + "/" + CONFIG_FILE)
+from pathlib import Path
+import os
+
+CONFIG_FILE = "config.yaml"
+ROOT_DIR = os.path.dirname(Path(__file__))  # current file directory
+_config_instance = Config(os.path.join(ROOT_DIR, CONFIG_FILE))
 
 
 def get_config(key: str, default: str = None) -> str:
