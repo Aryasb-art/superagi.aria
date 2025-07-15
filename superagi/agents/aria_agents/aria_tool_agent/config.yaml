@@ -1,0 +1,21 @@
+
+agent_type: "AriaToolAgent"
+name: "Aria Tool Agent"
+description: "Handles tool management and execution for AriaRobot"
+capabilities:
+  - tool_management
+  - tool_execution
+  - api_integration
+  - automation
+  - workflow
+default_config:
+  max_iterations: 100
+  memory_window: 15
+  permission_type: "God Mode"
+tools:
+  - "file"
+  - "thinking"
+  - "code"
+constraints:
+  - "Validate tool permissions before execution"
+  - "Log all tool operations for audit"

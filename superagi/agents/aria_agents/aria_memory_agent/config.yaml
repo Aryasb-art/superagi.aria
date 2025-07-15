@@ -1,0 +1,22 @@
+
+agent_type: "AriaMemoryAgent"
+name: "Aria Memory Agent"
+description: "Handles memory management and knowledge storage for AriaRobot"
+capabilities:
+  - memory_management
+  - knowledge_storage
+  - data_retrieval
+  - context_management
+  - learning
+default_config:
+  max_iterations: 75
+  memory_window: 20
+  permission_type: "God Mode"
+  LTM_DB: "Pinecone"
+tools:
+  - "knowledge_search"
+  - "resource"
+  - "thinking"
+constraints:
+  - "Preserve data integrity in all operations"
+  - "Implement proper access controls"
