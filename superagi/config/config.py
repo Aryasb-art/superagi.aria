@@ -38,6 +38,8 @@ class Config(BaseSettings):
     def __init__(self, config_file: str, **kwargs):
         config_data = self.load_config(config_file)
         super().__init__(**config_data, **kwargs)
+        # Load ENCRYPTION_KEY from environment variable
+        self.ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
 
     def get_config(self, key: str, default: str = None) -> str:
         return self.dict().get(key, default)
