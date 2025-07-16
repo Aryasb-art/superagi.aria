@@ -16,6 +16,10 @@ class Config(BaseSettings):
     def load_config(cls, config_file: str) -> dict:
         # If config file exists, read it
         if os.path.exists(config_file):
+            with open(config_file, "r") as f:
+    return yaml.safe_load(f)
+else:
+    return {}
 
     def get_config(cls, key: str, default=None):
         value = os.getenv(key)
