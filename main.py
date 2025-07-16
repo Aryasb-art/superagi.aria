@@ -1,36 +1,15 @@
-import os
 import requests
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Request, status, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
-from fastapi_sqlalchemy import DBSessionMiddleware
+from fastapi_sqlalchemy import DBSessionMiddleware, db
 from pydantic import BaseModel
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-# 👇 This block checks the database connection
-try:
-    engine = create_engine(os.getenv("DB_URL"))
-    with engine.connect() as connection:
-        print("✅ Database connected successfully")
-except Exception as e:
-    print("❌ Database connection failed:", e)
-
-import superagi
-from datetime import timedelta, datetime
-from superagi.agent.workflow_seed import IterationWorkflowSeed, AgentWorkflowSeed
-from superagi.config.config import get_config
-from superagi.controllers.agent import router as agent_router
-
-# 👇 This block checks the database connection status
-try:
-    engine = create_engine(os.getenv("DB_URL"))
-    with engine.connect() as connection:
-        print("✅ Database connected successfully")
-except Exception as e:
-    print("❌ Database connection failed:", e)
 
 import superagi
 from datetime import timedelta, datetime
