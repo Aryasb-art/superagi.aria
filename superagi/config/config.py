@@ -16,8 +16,10 @@ class Config(BaseSettings):
     def load_config(cls, config_file: str) -> dict:
         # If config file exists, read it
         if os.path.exists(config_file):
-            with open(config_file, "r") as file:
-                config_data = yaml.safe_load(file)
+          import os
+
+def get_config(key: str, default=None):
+    return os.getenv(key, default)
             if config_data is None:
                 config_data = {}
         else:
@@ -40,9 +42,6 @@ class Config(BaseSettings):
         super().__init__(**config_data, **kwargs)
         # Load ENCRYPTION_KEY from environment variable
         self.ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
-
-    def get_config(self, key: str, default: str = None) -> str:
-        return self.dict().get(key, default)
 
 
 from pathlib import Path
