@@ -59,4 +59,4 @@ _config_instance = Config(os.path.join(ROOT_DIR, CONFIG_FILE))
 
 
 def get_config(key: str, default: str = None) -> str:
-    return _config_instance.get_config(key, default)
+    return _config_instance.config_data.get(key, default)
