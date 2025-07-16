@@ -44,8 +44,8 @@ def load_config(cls, config_file: str) -> dict:
         return config_data
 
     def __init__(self, config_file: str, **kwargs):
-        config_data = self.load_config(config_file)
-        super().__init__(**config_data, **kwargs)
+        self.config_data = self.load_config(config_file)
+        super().__init__(**self.config_data, **kwargs)
         # Load ENCRYPTION_KEY from environment variable
         self.ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
 
