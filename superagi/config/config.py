@@ -1,62 +1,45 @@
 import os
-from pydantic import BaseSettings
+from typing import Optional
 from pathlib import Path
 import yaml
-from superagi.lib.logger import logger
+from pydantic import BaseSettings
 
 CONFIG_FILE = "config.yaml"
+ROOT_DIR = os.path.dirname(Path(__file__))
 
 
 class Config(BaseSettings):
+    DB_HOST: Optional[str] = None
+    DB_NAME: Optional[str] = None
+    DB_PASSWORD: Optional[str] = None
+    DB_PORT: Optional[int] = 5432
+    DB_URL: Optional[str] = None
+    DB_USERNAME: Optional[str] = None
+    ENCRYPTION_KEY: Optional[str] = None
+    ENV: Optional[str] = "DEV"
+    OPENAI_API_KEY: Optional[str] = None
+    PIP_NO_BINARY: Optional[str] = "1"
+    PYTHON_VERSION: Optional[str] = None
+
     class Config:
         env_file_encoding = "utf-8"
-        extra = "allow"  # Allow extra fields
+        extra = "allow"
 
-@classmethod
-def load_config(cls, config_file: str) -> dict:
-    # If config file exists, read it
-    if os.path.exists(config_file):
-        with open(config_file, "r") as f:
-            return yaml.safe_load(f)
-    else:
-        return {}
-    def get_config(cls, key: str, default=None):
-        value = os.getenv(key)
-        if value is not None:
-            return value
+    @classmethod
+    def load_config(cls, config_file=CONFIG_FILE):
+        config_data = {}
+        if os.path.exists(config_file):
+            with open(config_file, "r") as f:
+                config_data = yaml.safe_load(f) or {}
 
-        config_data = cls.load_config(CONFIG_FILE)
-
-        if config_data is None:
-            config_data = {}
-        else:
-            logger.info("\033[91m\033[1m"
-                        + "\nConfig file not found. Enter required keys and values."
-                        + "\033[0m\033[0m")
-            config_data = {}
-            with open(CONFIG_FILE, "w") as file:
-                yaml.dump(config_data, file, default_flow_style=False)
-
-        # Merge environment variables and config data
         env_vars = dict(os.environ)
         config_data = {**config_data, **env_vars}
 
-        return config_data
-
-    def __init__(self, config_file: str, **kwargs):
-        self.config_data = self.load_config(config_file)
-        super().__init__(**self.config_data, **kwargs)
-        # Load ENCRYPTION_KEY from environment variable
-        self.ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
+        return cls(**config_data)
 
 
-from pathlib import Path
-import os
-
-CONFIG_FILE = "config.yaml"
-ROOT_DIR = os.path.dirname(Path(__file__))  # current file directory
-_config_instance = Config(os.path.join(ROOT_DIR, CONFIG_FILE))
+_config_instance = Config.load_config()
 
 
-def get_config(key: str, default: str = None) -> str:
-    return _config_instance.config_data.get(key, default)
+def get_config(key: str, default=None):
+    return getattr(_config_instance, key, default)
