@@ -12,7 +12,7 @@ class Config(BaseSettings):
         env_file_encoding = "utf-8"
         extra = "allow"  # Allow extra fields
 
-    @classmethod
+@classmethod
 def load_config(cls, config_file: str) -> dict:
     # If config file exists, read it
     if os.path.exists(config_file):
