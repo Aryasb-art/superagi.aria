@@ -11,12 +11,12 @@ jobs:
         run: sudo apt-get install postgresql-client
 
       - name: Connect and run SELECT NOW()
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USERNAME }}
-          DB_PASS: ${{ secrets.DB_PASSWORD }}
-        run: |
-          echo "Testing DB connection..."
-          PGPASSWORD=$DB_PASS psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "SELECT NOW();"
+  env:
+    DB_HOST: ${{ secrets.DB_HOST }}
+    DB_PORT: ${{ secrets.DB_PORT }}
+    DB_NAME: ${{ secrets.DB_NAME }}
+    DB_USER: ${{ secrets.DB_USERNAME }}
+    DB_PASS: ${{ secrets.DB_PASSWORD }}
+  run: |
+    echo "Testing DB connection with SSL..."
+    PGPASSWORD=$DB_PASS psql "sslmode=require host=$DB_HOST port=$DB_PORT dbname=$DB_NAME user=$DB_USER" -c "SELECT NOW();"
