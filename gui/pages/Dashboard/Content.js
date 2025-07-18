@@ -236,7 +236,7 @@ export default function Content({env, selectedView, selectedProjectId, organisat
         })
     }
 
-    if (window.location.href.indexOf("google_calendar_creds") > -1) {
+    if (typeof window !== "undefined" && window.location.href.indexOf("google_calendar_creds") > -1) {
       const toolkit_id = localStorage.getItem("google_calendar_toolkit_id") || null;
       let data = Object.keys(parsedParams)[0];
       let params = JSON.parse(data);
