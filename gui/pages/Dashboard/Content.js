@@ -223,7 +223,7 @@ export default function Content({env, selectedView, selectedProjectId, organisat
     const parsedParams = querystring.parse(queryParams);
     parsedParams["toolkit_id"] = toolkitDetails.toolkit_id;
 
-    if (window.location.href.indexOf("twitter_creds") > -1) {
+    if (typeof window !== "undefined" && window.location.href.indexOf("twitter_creds") > -1) {
       parsedParams["toolkit_id"] = localStorage.getItem("twitter_toolkit_id") || null;
       const params = JSON.stringify(parsedParams)
 
