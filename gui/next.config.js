@@ -14,8 +14,15 @@ const nextConfig = {
         tls: false,
       };
     }
+    
+    // Handle echarts for SSR
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'echarts'];
+    }
+    
     return config;
-  }
+  },
+  transpilePackages: ['echarts']
 };
 
 module.exports = nextConfig;

@@ -9,7 +9,6 @@ import ToolkitWorkspace from '../Content/./Toolkits/ToolkitWorkspace';
 import Toolkits from '../Content/./Toolkits/Toolkits';
 import Settings from "./Settings/Settings";
 import styles from './Dashboard.module.css';
-import ApmDashboard from "../Content/APM/ApmDashboard";
 import AddModel from "../Content/Models/AddModel";
 import Models from "../Content/Models/Models";
 import ModelDetails from "../Content/Models/ModelDetails";
@@ -33,6 +32,12 @@ import AddTool from "@/pages/Content/Toolkits/AddTool";
 import {createInternalId, resetLocalStorage, preventDefault, getUserClick} from "@/utils/utils";
 import AddDatabase from "@/pages/Dashboard/Settings/AddDatabase";
 import DatabaseDetails from "@/pages/Dashboard/Settings/DatabaseDetails";
+import dynamic from 'next/dynamic';
+
+const ApmDashboard = dynamic(() => import('../Content/APM/ApmDashboard'), { 
+  ssr: false,
+  loading: () => <div style={{padding: '20px'}}>Loading dashboard...</div>
+});
 
 export default function Content({env, selectedView, selectedProjectId, organisationId}) {
   const [tabs, setTabs] = useState([]);

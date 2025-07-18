@@ -48,21 +48,36 @@ export default function ApmDashboard() {
     {i: 'total_calls_made', x: 4, y: 3, w: 4, h: 2},
     {i: 'tokens_consumed_per_call', x: 8, y: 3, w: 4, h: 2},
   ];
-  const storedLayout = typeof window !== 'undefined' ? localStorage.getItem('myLayoutKey') : null;
-  const [layout, setLayout] = useState(storedLayout !== null ? JSON.parse(storedLayout) : initialLayout);
+  const [layout, setLayout] = useState(initialLayout);
   const firstUpdate = useRef(true);
+
+  // Initialize layout from localStorage only on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedLayout = localStorage.getItem('myLayoutKey');
+      if (storedLayout) {
+        try {
+          setLayout(JSON.parse(storedLayout));
+        } catch (error) {
+          console.error('Failed to parse stored layout:', error);
+        }
+      }
+    }
+  }, []);
 
   const onLayoutChange = (currentLayout) => {
     setLayout(currentLayout);
   };
 
   const onClickLayoutChange = () => {
-    localStorage.setItem('myLayoutKey', JSON.stringify(initialLayout));
-    setLayout(initialLayout);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('myLayoutKey', JSON.stringify(initialLayout));
+      setLayout(initialLayout);
+    }
   }
 
   useEffect(() => {
-    if (!firstUpdate.current) {
+    if (typeof window !== 'undefined' && !firstUpdate.current) {
       localStorage.setItem('myLayoutKey', JSON.stringify(layout));
     } else {
       firstUpdate.current = false;
