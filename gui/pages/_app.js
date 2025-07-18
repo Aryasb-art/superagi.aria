@@ -1,7 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import SideBar from './Dashboard/SideBar';
-import Content from './Dashboard/Content';
-import TopBar from './Dashboard/TopBar';
+import dynamic from 'next/dynamic';
 import 'bootstrap/dist/css/bootstrap.css';
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -23,10 +21,15 @@ import {
 import {useRouter} from 'next/router';
 import querystring from 'querystring';
 import {refreshUrl, loadingTextEffect, getUTMParametersFromURL, setLocalStorageValue, getUserClick, sendGAEvent} from "@/utils/utils";
-import MarketplacePublic from "./Content/Marketplace/MarketplacePublic"
 import {toast} from "react-toastify";
 import mixpanel from 'mixpanel-browser';
 import Cookies from 'js-cookie';
+
+// Dynamic imports with SSR disabled
+const SideBar = dynamic(() => import('./Dashboard/SideBar'), { ssr: false });
+const Content = dynamic(() => import('./Dashboard/Content'), { ssr: false });
+const TopBar = dynamic(() => import('./Dashboard/TopBar'), { ssr: false });
+const MarketplacePublic = dynamic(() => import("./Content/Marketplace/MarketplacePublic"), { ssr: false });
 
 export default function App() {
   const [selectedView, setSelectedView] = useState('');
@@ -63,6 +66,8 @@ export default function App() {
 
 
   const installFromMarketplace = () => {
+    if (typeof window === 'undefined') return;
+    
     const toolkitName = localStorage.getItem('toolkit_to_install') || null;
     const agentTemplateId = localStorage.getItem('agent_to_install') || null;
     const knowledgeTemplateName = localStorage.getItem('knowledge_to_install') || null;
@@ -111,7 +116,7 @@ export default function App() {
       .then((response) => {
         const env = response.data.env;
         setEnv(env);
-        const mixpanelInitialized = Cookies.get('mixpanel_initialized') === 'true'
+        const mixpanelInitialized = typeof window !== 'undefined' ? Cookies.get('mixpanel_initialized') === 'true' : false;
         if (typeof window !== 'undefined') {
           if(response.data.env === 'PROD' && mixpanelId()) {
             mixpanel.init(mixpanelId(), {debug: false, track_pageview: !mixpanelInitialized, persistence: 'localStorage'});
@@ -127,14 +132,14 @@ export default function App() {
           let first_login = parsedParams.first_time_login || ''
 
           const utmParams = getUTMParametersFromURL();
-          if (utmParams) {
+          if (utmParams && typeof window !== 'undefined') {
             sessionStorage.setItem('utm_source', utmParams.utm_source);
             sessionStorage.setItem('utm_medium', utmParams.utm_medium);
             sessionStorage.setItem('campaign', utmParams.utm_campaign);
           }
-          const signupSource = sessionStorage.getItem('utm_source');
-          const signupMedium = sessionStorage.getItem('utm_medium');
-          const singupCampaign = sessionStorage.getItem('campaign');
+          const signupSource = typeof window !== 'undefined' ? sessionStorage.getItem('utm_source') : null;
+          const signupMedium = typeof window !== 'undefined' ? sessionStorage.getItem('utm_medium') : null;
+          const singupCampaign = typeof window !== 'undefined' ? sessionStorage.getItem('campaign') : null;
 
           if (typeof window !== 'undefined' && access_token) {
             // localStorage.setItem('accessToken', access_token);
@@ -242,7 +247,7 @@ export default function App() {
   };
 
   const handleMarketplace = () => {
-    if (window.location.href.toLowerCase().includes('marketplace')) {
+    if (typeof window !== 'undefined' && window.location.href.toLowerCase().includes('marketplace')) {
       setShowMarketplace(true);
     } else {
       installFromMarketplace();
@@ -250,6 +255,8 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const clearLocalStorage = () => {
       Object.keys(localStorage).forEach((key) => {
         if (!excludedKeys.includes(key)) {

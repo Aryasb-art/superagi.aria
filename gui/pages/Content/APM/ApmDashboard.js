@@ -1,14 +1,20 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
+import dynamic from 'next/dynamic';
 import Image from "next/image";
 import style from "./Apm.module.css";
 import 'react-toastify/dist/ReactToastify.css';
 import {getActiveRuns, getAgentRuns, getAllAgents, getToolsUsage, getMetrics} from "@/pages/api/DashboardService";
 import {formatNumber, formatTime, returnToolkitIcon} from "@/utils/utils";
-import {BarGraph} from "./BarGraph.js";
 import {WidthProvider, Responsive} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Tooltip } from 'react-tippy';
+
+// Dynamic import for BarGraph to avoid SSR issues
+const BarGraph = dynamic(() => import("./BarGraph.js").then(mod => ({ default: mod.BarGraph })), { 
+  ssr: false,
+  loading: () => <div>Loading chart...</div>
+});
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -42,7 +48,7 @@ export default function ApmDashboard() {
     {i: 'total_calls_made', x: 4, y: 3, w: 4, h: 2},
     {i: 'tokens_consumed_per_call', x: 8, y: 3, w: 4, h: 2},
   ];
-  const storedLayout = localStorage.getItem('myLayoutKey');
+  const storedLayout = typeof window !== 'undefined' ? localStorage.getItem('myLayoutKey') : null;
   const [layout, setLayout] = useState(storedLayout !== null ? JSON.parse(storedLayout) : initialLayout);
   const firstUpdate = useRef(true);
 
