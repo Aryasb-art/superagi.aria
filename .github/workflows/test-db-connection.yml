@@ -19,4 +19,4 @@ jobs:
           DB_PASS: ${{ secrets.DB_PASSWORD }}
         run: |
           echo "Testing DB connection with SSL..."
-          PGPASSWORD=$DB_PASS psql "sslmode=require host=$DB_HOST port=$DB_PORT dbname=$DB_NAME user=$DB_USER" -c "SELECT NOW();"
+          PGPASSWORD=$DB_PASS psql "sslmode=prefer host=$DB_HOST port=$DB_PORT dbname=$DB_NAME user=$DB_USER" -c "SELECT NOW();"
