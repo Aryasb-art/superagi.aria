@@ -168,13 +168,19 @@ export default function App() {
             })
             .catch((error) => {
               console.error('Error validating access token:', error);
+              setApplicationState("NOT_AUTHENTICATED");
             });
         } else {
           handleLocalEnviroment()
         }
       })
       .catch((error) => {
-        console.error('Error fetching project:', error);
+        console.error('Error connecting to backend:', error);
+        setLoadingText("Backend connection failed. Please check API URL.");
+        // Fallback to local environment if backend is unreachable
+        setTimeout(() => {
+          handleLocalEnviroment();
+        }, 3000);
       });
 
   }, []);
@@ -210,11 +216,19 @@ export default function App() {
 
       // If `github_client_id` does not exist, make the API call
       if (!github_client_id) {
-        const response = await getGithubClientId();
-        github_client_id = response.data.github_client_id;
+        try {
+          const response = await getGithubClientId();
+          github_client_id = response.data.github_client_id;
+        } catch (error) {
+          console.error('Error fetching github client id:', error);
+          // Continue without GitHub OAuth if API call fails
+          toast.error("GitHub authentication unavailable. Please check backend connection.");
+          return;
+        }
       }
       if(!github_client_id) {
          console.error('Error fetching github client id make sure to set it in the config file');
+         toast.error("GitHub client ID not configured. Please contact administrator.");
       }
       else {
         window.open(`https://github.com/login/oauth/authorize?scope=user:email&client_id=${github_client_id}`, '_self')

@@ -89,7 +89,12 @@ export const validateLLMApiKey = (model_source, model_api_key) => {
 };
 
 export const checkEnvironment = () => {
-  return api.get(`/configs/get/env`);
+  console.log('Checking environment at:', `${baseUrl()}/configs/get/env`);
+  return api.get('/configs/get/env').catch(error => {
+    console.error('Environment check failed:', error);
+    console.error('API Base URL:', baseUrl());
+    throw error;
+  });
 };
 
 export const getOrganisationConfig = (organisationId, key) => {
