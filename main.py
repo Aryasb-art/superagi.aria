@@ -387,6 +387,12 @@ def github_client_id():
         git_hub_client_id = git_hub_client_id.strip()
     return {"github_client_id": git_hub_client_id}
 
+
+@app.get('/ping')
+def health_check():
+    """Health check endpoint"""
+    return {"status": "ok"}
+
 # # __________________TO RUN____________________________
 # # uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 
