@@ -22,11 +22,7 @@ const nextConfig = {
     
     return config;
   },
-  transpilePackages: ['echarts'],
-  // Configure server for Replit deployment
-  serverRuntimeConfig: {
-    port: process.env.PORT || 5000
-  }
+  transpilePackages: ['echarts']
 };
 
 module.exports = nextConfig;
