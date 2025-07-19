@@ -393,5 +393,12 @@ def health_check():
     """Health check endpoint"""
     return {"status": "ok"}
 
+
+@app.get('/configs/get/env')
+def get_env():
+    """Get environment configuration"""
+    env = get_config('ENV', 'DEV')
+    return {"env": env}
+
 # # __________________TO RUN____________________________
 # # uvicorn main:app --host 0.0.0.0 --port 8001 --reload
