@@ -52,4 +52,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+console.log("🔍 API_BASE_URL in runtime:", API_BASE_URL);
+
 export default api;
