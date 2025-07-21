@@ -2,7 +2,6 @@ import axios from 'axios';
 import Cookies from "js-cookie";
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
