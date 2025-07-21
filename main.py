@@ -394,6 +394,12 @@ def health_check():
     return {"status": "ok"}
 
 
+@app.get('/api/health')
+def api_health_check():
+    """API health check endpoint for Render"""
+    return {"status": "ok"}
+
+
 @app.get('/configs/get/env')
 def get_env():
     """Get environment configuration"""
