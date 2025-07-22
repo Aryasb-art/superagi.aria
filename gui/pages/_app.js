@@ -39,6 +39,7 @@ export default function App() {
   const [organisationId, setOrganisationId] = useState(null);
   const [env, setEnv] = useState('DEV');
   console.log("🧠 Starting SuperAGI init...");
+console.log("🧠 Starting SuperAGI init...");
   const [loadingText, setLoadingText] = useState("Initializing SuperAGI");
   const router = useRouter();
   const [showMarketplace, setShowMarketplace] = useState(false);
@@ -112,6 +113,7 @@ export default function App() {
   useEffect(() => {
     handleMarketplace()
     console.log("🧠 Starting SuperAGI init...");
+console.log("🧠 Starting SuperAGI init...");
     loadingTextEffect('Initializing SuperAGI', setLoadingText, 500);
 
     checkEnvironment()
