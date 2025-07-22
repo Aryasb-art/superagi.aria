@@ -400,6 +400,12 @@ def api_health_check():
     return {"status": "ok"}
 
 
+@app.get('/api/ping')
+def api_ping():
+    """API ping endpoint for frontend initialization"""
+    return {"message": "pong", "status": "ok"}
+
+
 @app.get('/configs/get/env')
 def get_env():
     """Get environment configuration"""
