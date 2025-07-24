@@ -1,22 +1,36 @@
 
-agent_type: "AriaMemoryAgent"
-name: "Aria Memory Agent"
-description: "Handles memory management and knowledge storage for AriaRobot"
+name: "AriaMemoryAgent"
+description: "Handles memory management and knowledge storage with advanced retrieval capabilities"
+version: "1.0.0"
+author: "SuperAGI"
+
 capabilities:
   - memory_management
   - knowledge_storage
   - data_retrieval
   - context_management
   - learning
-default_config:
-  max_iterations: 75
-  memory_window: 20
-  permission_type: "God Mode"
-  LTM_DB: "Pinecone"
-tools:
-  - "knowledge_search"
-  - "resource"
-  - "thinking"
-constraints:
-  - "Preserve data integrity in all operations"
-  - "Implement proper access controls"
+
+parameters:
+  max_memory_size: 1000
+  retention_period: 86400
+  enable_compression: true
+
+dependencies:
+  - base_aria_agent
+
+task_types:
+  - store_memory
+  - retrieve_memory
+  - search_memory
+  - manage_context
+
+input_types:
+  - memory_data
+  - query
+  - context
+
+output_formats:
+  - memory_result
+  - search_results
+  - context_data

@@ -1,20 +1,42 @@
 
-agent_type: "AriaUtilityAgent"
-name: "Aria Utility Agent"
-description: "Handles utility and system helper tasks for AriaRobot"
+name: "AriaUtilityAgent"
+description: "Handles utility and helper tasks with comprehensive data processing capabilities"
+version: "1.0.0"
+author: "SuperAGI"
+
 capabilities:
-  - utility
-  - helper
-  - system_tasks
-  - maintenance
-  - diagnostics
-default_config:
-  max_iterations: 50
-  memory_window: 10
-  permission_type: "God Mode"
-tools:
-  - "file"
-  - "thinking"
-constraints:
-  - "Ensure all utility operations are logged"
-  - "Validate input parameters before processing"
+  - text_processing
+  - data_formatting
+  - string_manipulation
+  - list_operations
+  - dictionary_operations
+  - file_operations
+  - json_processing
+  - utility_functions
+
+parameters:
+  max_text_length: 10000
+  default_operation: "basic"
+  output_format: "json"
+
+dependencies:
+  - base_aria_agent
+
+task_types:
+  - text_processing
+  - data_formatting
+  - json_processing
+  - list_operations
+  - dictionary_operations
+
+input_types:
+  - text
+  - json
+  - list
+  - dictionary
+  - any
+
+output_formats:
+  - processed_data
+  - formatted_output
+  - operation_result

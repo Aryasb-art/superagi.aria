@@ -4,6 +4,7 @@ from superagi.agents.aria_agents.base_aria_agent import BaseAriaAgent
 from superagi.agents.aria_agents.aria_utility_agent.aria_utility_agent import AriaUtilityAgent
 from superagi.agents.aria_agents.aria_tool_agent.aria_tool_agent import AriaToolAgent
 from superagi.agents.aria_agents.aria_memory_agent.aria_memory_agent import AriaMemoryAgent
+from superagi.agents.aria_agents.aria_summary_agent.aria_summary_agent import AriaSummaryAgent
 from superagi.lib.logger import logger
 
 class AriaAgentRegistry:
@@ -15,6 +16,7 @@ class AriaAgentRegistry:
         "AriaUtilityAgent": AriaUtilityAgent,
         "AriaToolAgent": AriaToolAgent,
         "AriaMemoryAgent": AriaMemoryAgent,
+        "AriaSummaryAgent": AriaSummaryAgent,
     }
     
     _capability_map: Dict[str, List[str]] = {}
