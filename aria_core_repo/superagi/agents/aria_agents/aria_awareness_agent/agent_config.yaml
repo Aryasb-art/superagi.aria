@@ -1,0 +1,88 @@
+name: "AriaAwarenessAgent"
+description: "Advanced self-awareness and mental state analysis agent"
+version: "1.0.0"
+author: "AriaRobot Team"
+license: "MIT"
+
+agent_config:
+  type: "analysis"
+  category: "self_awareness"
+  priority: "medium"
+  
+  capabilities:
+    - "self_awareness_analysis"
+    - "mental_state_detection"
+    - "metacognitive_patterns"
+    - "behavioral_insights"
+    - "openai_integration"
+    - "postgresql_integration"
+    - "persian_awareness"
+  
+  languages:
+    - "persian"
+    - "english"
+  
+  memory:
+    short_term_limit: 10
+    supports_long_term: true
+    memory_types: ["awareness", "mental_state", "patterns"]
+  
+  dependencies:
+    - "base_agent"
+    - "openai"
+    - "postgresql"
+    - "sqlalchemy"
+    - "logging"
+  
+  routing_keywords:
+    - "awareness"
+    - "reflection"
+    - "self"
+    - "آگاهی"
+    - "خودآگاهی"
+    - "تأمل"
+    - "بازتاب"
+
+runtime:
+  auto_start: true
+  restart_on_failure: true
+  timeout: 45
+
+openai:
+  model: "gpt-4o"
+  max_tokens: 600
+  temperature: 0.3
+
+status_levels:
+  - "ok"
+  - "warning"
+  - "alert"
+
+message_categories:
+  - "self-reflection"
+  - "planning"
+  - "emotional"
+  - "learning"
+  - "general"
+
+database:
+  table_name: "self_awareness_logs"
+  fields:
+    - "id"
+    - "user_id"
+    - "input_text"
+    - "status"
+    - "alert"
+    - "confidence"
+    - "related_memory"
+    - "analysis_data"
+    - "created_at"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+integration:
+  database_required: true
+  openai_required: true
+  external_apis: ["openai"]

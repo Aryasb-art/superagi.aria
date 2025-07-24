@@ -1,0 +1,88 @@
+name: "AriaMemoryAgent"
+description: "مدیر حافظه بلندمدت - Advanced memory management agent with PostgreSQL integration"
+version: "1.0.0"
+author: "AriaRobot Team"
+license: "MIT"
+
+# Agent configuration
+agent_config:
+  type: "memory"
+  category: "data_management"
+  priority: "high"
+  
+  # Capabilities
+  capabilities:
+    - "longterm_memory_storage"
+    - "memory_categorization"
+    - "tagging_system"
+    - "postgresql_integration"
+    - "search_retrieval"
+    - "persian_categories"
+  
+  # Language support
+  languages:
+    - "persian"
+    - "english"
+  
+  # Memory configuration
+  memory:
+    short_term_limit: 10
+    supports_long_term: true
+    memory_types: ["longterm", "categorized", "tagged"]
+  
+  # Dependencies
+  dependencies:
+    - "base_agent"
+    - "postgresql"
+    - "sqlalchemy"
+    - "logging"
+  
+  # Routing keywords
+  routing_keywords:
+    - "memory"
+    - "remember"
+    - "recall"
+    - "حافظه"
+    - "یادآوری"
+    - "ذخیره"
+    - "یادداشت"
+
+# Runtime configuration
+runtime:
+  auto_start: true
+  restart_on_failure: true
+  timeout: 30
+  
+# Memory categories
+memory_categories:
+  - "هدف"
+  - "تجربه"
+  - "درس"
+  - "یادآوری"
+  - "احساس"
+  - "یادداشت"
+  - "ایده"
+  - "برنامه"
+  
+# Database configuration
+database:
+  table_name: "longterm_memories"
+  fields:
+    - "id"
+    - "user_id"
+    - "content"
+    - "category"
+    - "tags"
+    - "created_at"
+    - "updated_at"
+  
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+# Integration settings
+integration:
+  database_required: true
+  openai_required: false
+  external_apis: []
