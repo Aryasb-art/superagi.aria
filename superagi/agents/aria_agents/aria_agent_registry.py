@@ -34,7 +34,7 @@ class AriaAgentRegistry:
         cls._agents[agent_type] = agent_class
         
         # Create temporary instance to get capabilities
-        temp_instance = agent_class(None, 0)
+        temp_instance = agent_class(None, 0, {})
         capabilities = temp_instance.get_capabilities()
         
         for capability in capabilities:
@@ -70,7 +70,7 @@ class AriaAgentRegistry:
         """Initialize the registry with all agents"""
         for agent_class in cls._agents.values():
             try:
-                temp_instance = agent_class(None, 0)
+                temp_instance = agent_class(None, 0, {})
                 capabilities = temp_instance.get_capabilities()
                 
                 for capability in capabilities:
