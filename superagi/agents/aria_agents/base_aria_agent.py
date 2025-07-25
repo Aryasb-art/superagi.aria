@@ -21,7 +21,7 @@ class BaseAriaAgent(ABC):
         self.name = "BaseAriaAgent"
         self.description = "Base class for all Aria agents"
         self.capabilities = []
-        self.logger = logger
+        self.logger = logging.getLogger(f"aria.{self.agent_id}")
 
     @abstractmethod
     def execute(self, *args, **kwargs):
@@ -41,4 +41,3 @@ class BaseAriaAgent(ABC):
     def get_capabilities(self) -> List[str]:
         """Return agent capabilities"""
         return self.capabilities
-`
