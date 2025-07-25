@@ -12,17 +12,7 @@ from superagi.lib.logger import logger
 class AriaGoalAgent(BaseAriaAgent):
     """
     Aria Goal Agent - Handles goal setting, tracking, and achievement
-    """
-
-    def __init__(self, session, agent_id, agent_config=None):
-        super().__init__(session, agent_id, agent_config)
-        self.config = self._load_config()
-
-    def get_agent_type(self) -> str:
-        """Return agent type"""
-        return "AriaGoalAgent"
-
-    """
+    
     AriaGoalAgent handles comprehensive goal processing including:
     - Goal detection and recognition
     - Intent analysis and categorization
@@ -31,8 +21,9 @@ class AriaGoalAgent(BaseAriaAgent):
     - Behavioral pattern analysis
     """
 
-    def __init__(self, llm, agent_id: int, agent_execution_id: int = None):
-        super().__init__(llm, agent_id, agent_execution_id)
+    def __init__(self, session, agent_id, agent_config=None):
+        super().__init__(session, agent_id, agent_config)
+        self.config = self._load_config()
         self.agent_name = "AriaGoalAgent"
         self.goal_history = []
         self.current_goals = []
@@ -43,6 +34,10 @@ class AriaGoalAgent(BaseAriaAgent):
             "learning/knowledge", "health/wellness", "relationship/social",
             "career/work", "general/other"
         ]
+
+    def get_agent_type(self) -> str:
+        """Return agent type"""
+        return "AriaGoalAgent"
 
     def get_capabilities(self) -> List[str]:
         """Return the capabilities of this agent"""
