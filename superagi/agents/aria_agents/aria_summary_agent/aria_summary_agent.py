@@ -73,7 +73,7 @@ class AriaSummaryAgent(BaseAriaAgent):
                 "agent": self.get_agent_type()
             }
             
-            self.remember(f"Completed summary task: {task}")
+            logger.info(f"Completed summary task: {task}")
             return execution_result
             
         except Exception as e:
