@@ -23,7 +23,6 @@ class AriaGoalAgent(BaseAriaAgent):
 
     def __init__(self, session, agent_id, agent_config=None):
         super().__init__(session, agent_id, agent_config)
-        self.config = self._load_config()
         self.agent_name = "AriaGoalAgent"
         self.goal_history = []
         self.current_goals = []
