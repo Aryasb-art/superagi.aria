@@ -53,12 +53,14 @@ class AriaMemoryAgent(BaseAriaAgent):
         """
         return "AriaMemoryAgent"
 
-    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, task: Dict[str, Any], context=None, config=None) -> Dict[str, Any]:
         """
         Execute memory-related tasks
 
         Args:
             task: Dictionary containing task information
+            context: Optional context dictionary
+            config: Optional configuration dictionary
 
         Returns:
             Dictionary containing execution results
