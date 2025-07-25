@@ -2,7 +2,10 @@ import os
 from typing import Optional
 from pathlib import Path
 import yaml
-from pydantic import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings
 
 CONFIG_FILE = "config.yaml"
 ROOT_DIR = os.path.dirname(Path(__file__))

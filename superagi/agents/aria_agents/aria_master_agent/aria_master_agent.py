@@ -117,6 +117,18 @@ class AriaMasterAgent(BaseAriaAgent):
         final_response = f"Master Agent coordinated task execution:\n" + "\n".join(results)
         return final_response
 
+    def execute(self, *args, **kwargs):
+        """Execute master agent functionality"""
+        if args:
+            message = args[0]
+            context = kwargs.get('context')
+            return self.respond(message, context)
+        return {"status": "executed", "agent": self.name}
+
+    def get_agent_type(self) -> str:
+        """Return the agent type"""
+        return "AriaMasterAgent"
+
     def get_capabilities(self) -> Dict[str, Any]:
         """Return agent capabilities"""
         return {
