@@ -4,7 +4,7 @@ import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from superagi.agents.aria_agents.base_aria_agent import BaseAriaAgent
-from superagi.logger import logger
+from superagi.lib.logger import logger
 
 
 class AriaSummaryAgent(BaseAriaAgent):
