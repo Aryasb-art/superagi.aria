@@ -4,7 +4,7 @@ import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from superagi.agents.aria_agents.base_aria_agent import BaseAriaAgent
-from superagi.lib.logger import logger
+from superagi.logger import logger
 
 
 class AriaSummaryAgent(BaseAriaAgent):
@@ -39,7 +39,7 @@ class AriaSummaryAgent(BaseAriaAgent):
             Dict: Task execution result with summary and analysis
         """
         try:
-            self.log(f"Executing summary task: {task}")
+            logger.info(f"Executing summary task: {task}")
             
             if not context:
                 context = {}
@@ -84,7 +84,7 @@ class AriaSummaryAgent(BaseAriaAgent):
                 "timestamp": datetime.utcnow().isoformat(),
                 "agent": self.get_agent_type()
             }
-            self.log(f"Error executing summary task: {str(e)}", "error")
+            logger.error(f"Error executing summary task: {str(e)}")
             return error_result
 
     def _summarize_text(self, content: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
