@@ -435,3 +435,27 @@ class AriaToolAgent(BaseAriaAgent):
         
         else:
             return {"formatted_output": str(data), "format": "text"}
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing tool task"""
+        try:
+            # Parse message to determine task type and context
+            task_context = context or {}
+            task_context.setdefault('task_type', 'general')
+            
+            # Execute tool task
+            result = self.execute(message, task_context)
+            
+            return {
+                "response": f"Tool task completed: {result.get('result', {}).get('general_execution', {}).get('result', 'Task processed successfully')}",
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing tool task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }

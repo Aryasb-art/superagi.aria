@@ -455,3 +455,34 @@ class AriaSummaryAgent(BaseAriaAgent):
             itype = type(item).__name__
             type_counts[itype] = type_counts.get(itype, 0) + 1
         return type_counts
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing summary task"""
+        try:
+            # Parse message to determine summary task
+            task_context = context or {}
+            task_context.setdefault('task_type', 'text_summary')
+            task_context.setdefault('content', message)
+            
+            # Execute summary task
+            result = self.execute(message, task_context)
+            
+            summary_result = result.get('result', {})
+            if isinstance(summary_result, dict) and 'summary' in summary_result:
+                response_text = summary_result['summary']
+            else:
+                response_text = "Summary completed successfully"
+            
+            return {
+                "response": response_text,
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing summary task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }

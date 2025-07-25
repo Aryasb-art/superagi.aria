@@ -408,3 +408,36 @@ class AriaGoalAgent(BaseAriaAgent):
             "recent_goals": [entry['detected_goals'] for entry in self.goal_history[-5:]],
             "most_common_category": self._get_most_common_category()
         }
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing goal task"""
+        try:
+            # Parse message to determine goal task
+            task = {'type': 'analyze_goal', 'input': message, 'context': context or {}}
+            
+            if 'detect' in message.lower() or 'goal' in message.lower():
+                task['type'] = 'detect_goal'
+            elif 'plan' in message.lower():
+                task['type'] = 'plan_goal'
+                task['goal'] = message
+            elif 'intent' in message.lower():
+                task['type'] = 'analyze_intent'
+            elif 'motivation' in message.lower():
+                task['type'] = 'assess_motivation'
+            
+            # Execute goal task
+            result = self.execute(task)
+            
+            return {
+                "response": f"Goal analysis completed: {result.get('message', 'Goal task processed successfully')}",
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing goal task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }

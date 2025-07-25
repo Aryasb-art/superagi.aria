@@ -449,3 +449,36 @@ class AriaMemoryAgent(BaseAriaAgent):
             },
             "total_memories": len(self.short_term_memory) + len(self.long_term_memory)
         }
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing memory task"""
+        try:
+            # Parse message to determine memory operation
+            task = {'type': 'general_memory', 'data': message, 'context': context or {}}
+            
+            if 'store' in message.lower():
+                task['type'] = 'store_memory'
+                task['data'] = {'content': message}
+            elif 'retrieve' in message.lower() or 'remember' in message.lower():
+                task['type'] = 'search_memory'
+                task['query'] = message
+            elif 'search' in message.lower():
+                task['type'] = 'search_memory'
+                task['query'] = message
+            
+            # Execute memory task
+            result = self.execute(task)
+            
+            return {
+                "response": f"Memory operation completed: {result.get('message', 'Memory task processed successfully')}",
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing memory task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }

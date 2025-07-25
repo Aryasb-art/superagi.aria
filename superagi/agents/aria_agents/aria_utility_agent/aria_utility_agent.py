@@ -288,3 +288,28 @@ class AriaUtilityAgent(BaseAriaAgent):
             "data_type": type(data).__name__,
             "data_preview": str(data)[:100] if data else None
         }
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing utility task"""
+        try:
+            # Parse message to determine task type and context
+            task_context = context or {}
+            task_context.setdefault('task_type', 'text_processing')
+            task_context.setdefault('data', message)
+            
+            # Execute utility task
+            result = self.execute(message, task_context)
+            
+            return {
+                "response": f"Utility task completed: {result.get('result', {}).get('message', 'Task processed successfully')}",
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing utility task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }

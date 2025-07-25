@@ -1047,3 +1047,35 @@ class AriaEmotionAgent(BaseAriaAgent):
             "active_regulations": len(self.regulation_strategies.get('active_regulations', [])),
             "emotional_stability": self._calculate_emotional_stability()
         }
+
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response by executing emotion task"""
+        try:
+            # Parse message to determine emotion task
+            task = {'type': 'analyze_emotion', 'input': {'text': message}, 'context': context or {}}
+            
+            if 'detect' in message.lower() or 'emotion' in message.lower():
+                task['type'] = 'detect_emotion'
+                task['input_type'] = 'text'
+            elif 'sentiment' in message.lower():
+                task['type'] = 'analyze_sentiment'
+                task['content'] = message
+            elif 'mood' in message.lower():
+                task['type'] = 'track_mood'
+            
+            # Execute emotion task
+            result = self.execute(task)
+            
+            return {
+                "response": f"Emotion analysis completed: {result.get('message', 'Emotion task processed successfully')}",
+                "success": True,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            return {
+                "response": f"Error processing emotion task: {str(e)}",
+                "success": False,
+                "agent": self.get_agent_type(),
+                "timestamp": datetime.utcnow().isoformat()
+            }
