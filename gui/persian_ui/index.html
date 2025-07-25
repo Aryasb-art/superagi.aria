@@ -241,11 +241,13 @@
                 <div class="form-group">
                     <label>انتخاب ایجنت:</label>
                     <select id="agent-selector">
+                        <option value="AriaGoalAgent">ایجنت هدف (پیشنهادی)</option>
                         <option value="AriaMasterAgent">ایجنت اصلی</option>
                         <option value="AriaUtilityAgent">ایجنت کمکی</option>
                         <option value="AriaMemoryAgent">ایجنت حافظه</option>
                         <option value="AriaSummaryAgent">ایجنت خلاصه‌سازی</option>
                         <option value="AriaToolAgent">ایجنت ابزار</option>
+                        <option value="AriaEmotionAgent">ایجنت احساسات</option>
                     </select>
                 </div>
                 <button class="btn" onclick="sendToAgent()">ارسال به ایجنت</button>
@@ -457,13 +459,40 @@
             responseDiv.textContent = 'در حال پردازش...';
             
             try {
-                // Simulate API call
-                setTimeout(() => {
-                    const response = `پاسخ از ${agent}:\n\nپیام شما "${message}" دریافت و پردازش شد.\n\nزمان: ${new Date().toLocaleString('fa-IR')}\nوضعیت: موفق`;
-                    responseDiv.textContent = response;
-                }, 1500);
+                const response = await fetch('/api/execute_agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        agent_type: agent
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    responseDiv.innerHTML = `
+                        <strong>✅ پاسخ از ${result.agent_type}:</strong><br><br>
+                        <strong>پیام شما:</strong> ${result.message}<br><br>
+                        <strong>نتیجه:</strong><br>
+                        ${JSON.stringify(result.result, null, 2)}<br><br>
+                        <strong>زمان:</strong> ${new Date(result.timestamp).toLocaleString('fa-IR')}<br>
+                        <strong>وضعیت:</strong> موفق
+                    `;
+                } else {
+                    responseDiv.innerHTML = `
+                        <strong>❌ خطا در اجرا:</strong><br><br>
+                        ${result.error}<br><br>
+                        <strong>زمان:</strong> ${new Date(result.timestamp).toLocaleString('fa-IR')}
+                    `;
+                }
             } catch (error) {
-                responseDiv.textContent = 'خطا در ارسال پیام: ' + error.message;
+                responseDiv.innerHTML = `
+                    <strong>❌ خطا در ارتباط با سرور:</strong><br><br>
+                    ${error.message}
+                `;
             }
         }
         

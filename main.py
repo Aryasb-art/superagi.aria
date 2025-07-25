@@ -60,6 +60,9 @@ from superagi.models.workflows.agent_workflow import AgentWorkflow
 from superagi.models.workflows.iteration_workflow import IterationWorkflow
 from superagi.models.workflows.iteration_workflow_step import IterationWorkflowStep
 from urllib.parse import urlparse
+from fastapi.staticfiles import StaticFiles
+import os
+
 app = FastAPI()
 
 db_host = get_config('DB_HOST', 'super__postgres')
@@ -136,6 +139,54 @@ app.include_router(marketplace_stats_router, prefix="/marketplace")
 app.include_router(api_key_router, prefix="/api-keys")
 app.include_router(api_agent_router,prefix="/v1/agent")
 app.include_router(web_hook_router,prefix="/webhook")
+
+from superagi.agents.aria_agents.aria_controller import AriaController
+
+# API endpoint for Aria agents
+@app.post('/api/execute_agent')
+async def execute_aria_agent(request_data: dict):
+    """Execute Aria agent with user input"""
+    try:
+        message = request_data.get('message', '')
+        agent_type = request_data.get('agent_type', 'AriaGoalAgent')
+
+        if not message:
+            raise HTTPException(status_code=400, detail="پیام نمی‌تواند خالی باشد")
+
+        # Initialize controller
+        controller = AriaController(db.session)
+
+        # Create and execute agent
+        agent = controller.create_agent(agent_type)
+        if not agent:
+            raise HTTPException(status_code=500, detail=f"خطا در ایجاد ایجنت {agent_type}")
+
+        # Execute task
+        result = agent.execute_task(message)
+
+        return {
+            "success": True,
+            "agent_type": agent_type,
+            "message": message,
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Error executing Aria agent: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+# Serve static files from the "gui/persian_ui" directory
+app.mount("/persian_ui", StaticFiles(directory="gui/persian_ui"), name="persian_ui")
+
+# Define a route to serve the index.html file
+@app.get("/")
+async def read_root():
+    return RedirectResponse("/persian_ui/index.html")
 
 # in production you can use Settings management
 # from pydantic to get secret key from .env
