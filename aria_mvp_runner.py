@@ -82,6 +82,27 @@ class AriaMVPRunner:
             print(f"❌ خطا در بررسی سلامت: {e}")
             return False
     
+    def chain_demo(self):
+        """Demonstrate agent chain execution"""
+        print("\n🔗 حالت نمایشی Chain - اجرای زنجیره‌ای ایجنت‌ها")
+        print("=" * 50)
+        
+        test_task = "من می‌خواهم یک برنامه ساده برای مدیریت کارها بسازم"
+        print(f"🎯 تسک اولیه: {test_task}")
+        
+        result = self.controller.execute_chain(test_task)
+        
+        if result.get("success"):
+            print("✅ Chain با موفقیت اجرا شد!")
+            print(f"📝 نتیجه نهایی: {result.get('final_output', '')[:200]}...")
+            print(f"🔄 مراحل انجام شده: {result.get('steps_completed')}")
+            
+            # Show each step result
+            for i, step in enumerate(result.get('execution_history', [])):
+                print(f"   Step {i+1}: {step.get('step_name')} ✅")
+        else:
+            print(f"❌ Chain با خطا مواجه شد: {result.get('error')}")
+
     def demo_mode(self):
         """Run demonstration of all agents"""
         print("\n🎬 حالت نمایشی - تست همه ایجنت‌ها")
@@ -114,7 +135,7 @@ class AriaMVPRunner:
     def interactive_test(self):
         """Interactive testing mode"""
         print("\n🎮 حالت تست تعاملی")
-        print("دستورات: 'status', 'agents', 'demo', 'exit'")
+        print("دستورات: 'status', 'agents', 'demo', 'chain', 'exit'")
         print("یا یک تسک برای اجرا وارد کنید")
         print("─" * 40)
         
@@ -132,6 +153,8 @@ class AriaMVPRunner:
                     print(f"📋 ایجنت‌های موجود: {', '.join(agents)}")
                 elif user_input.lower() == 'demo':
                     self.demo_mode()
+                elif user_input.lower() == 'chain':
+                    self.chain_demo()
                 elif user_input:
                     print(f"🚀 اجرای تسک: {user_input}")
                     result = self.controller.execute_task(user_input)
@@ -162,6 +185,10 @@ class AriaMVPRunner:
             if self.health_check():
                 self.demo_mode()
             return True
+        elif mode == "chain":
+            if self.health_check():
+                self.chain_demo()
+            return True
         elif mode == "interactive":
             if self.health_check():
                 self.interactive_test()
@@ -175,8 +202,8 @@ def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description='Aria Robot MVP Runner')
     parser.add_argument('--mode', default='interactive', 
-                       choices=['health', 'demo', 'interactive'],
-                       help='Run mode: health check, demo, or interactive')
+                       choices=['health', 'demo', 'chain', 'interactive'],
+                       help='Run mode: health check, demo, chain, or interactive')
     
     args = parser.parse_args()
     
