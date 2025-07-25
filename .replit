@@ -8,3 +8,15 @@ packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt"
 [deployment]
 run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]
 build = ["sh", "-c", "cd gui && npm install && npm run build"]
+
+[workflows]
+runButton = "Aria MVP"
+
+[[workflows.workflow]]
+name = "Aria MVP"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python aria_mvp_runner.py --mode interactive"

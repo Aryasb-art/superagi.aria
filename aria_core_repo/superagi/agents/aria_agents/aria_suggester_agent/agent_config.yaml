@@ -1,0 +1,91 @@
+name: "AriaSuggesterAgent"
+description: "Intelligent suggestion and contextual guidance agent"
+version: "1.0.0"
+author: "AriaRobot Team"
+license: "MIT"
+
+agent_config:
+  type: "assistance"
+  category: "guidance"
+  priority: "medium"
+  
+  capabilities:
+    - "text_completion"
+    - "contextual_suggestions"
+    - "memory_analysis"
+    - "openai_integration"
+    - "postgresql_integration"
+    - "persian_suggestions"
+  
+  languages:
+    - "persian"
+    - "english"
+  
+  memory:
+    short_term_limit: 10
+    supports_long_term: true
+    memory_types: ["suggestions", "context", "completion"]
+  
+  dependencies:
+    - "base_agent"
+    - "openai"
+    - "postgresql"
+    - "sqlalchemy"
+    - "logging"
+  
+  routing_keywords:
+    - "suggest"
+    - "complete"
+    - "hint"
+    - "پیشنهاد"
+    - "تکمیل"
+    - "راهنما"
+    - "کمک"
+
+runtime:
+  auto_start: true
+  restart_on_failure: true
+  timeout: 45
+
+openai:
+  model: "gpt-4o"
+  max_tokens: 600
+  temperature: 0.5
+
+suggestion_types:
+  - "ادامه متن"
+  - "اقدام بعدی"
+  - "هشدار"
+  - "مطالب مرتبط"
+  - "بهبود"
+  - "سوال راهنما"
+  - "هدف پیشنهادی"
+  - "یادآوری"
+
+context_categories:
+  - "goal"
+  - "problem"
+  - "completion"
+  - "learning"
+  - "general"
+
+database:
+  table_name: "auto_suggestions"
+  fields:
+    - "id"
+    - "user_id"
+    - "input_text"
+    - "suggestion"
+    - "suggestion_type"
+    - "confidence"
+    - "context_data"
+    - "created_at"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+integration:
+  database_required: true
+  openai_required: true
+  external_apis: ["openai"]

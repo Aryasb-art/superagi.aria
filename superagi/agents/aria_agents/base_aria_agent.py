@@ -1,40 +1,43 @@
-
+"""Fix constructor signature and add missing abstract methods"""
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any
-from superagi.models.agent import Agent
-from superagi.models.agent_config import AgentConfiguration
-from superagi.lib.logger import logger
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+from collections import deque
+import logging
+import uuid
+
 
 class BaseAriaAgent(ABC):
     """
-    Base class for all Aria Robot agents in SuperAGI
+    Abstract base class for all SuperAGI Aria agents.
+    Provides core functionality including message handling, logging, and state management.
     """
-    
-    def __init__(self, session, agent_id: int):
+
+    def __init__(self, session, agent_id: str, config: Optional[Dict[str, Any]] = None):
+        """Initialize base aria agent"""
         self.session = session
         self.agent_id = agent_id
-        self.agent = Agent.get_agent_from_id(session, agent_id)
-        self.config = Agent.fetch_configuration(session, agent_id)
-        
+        self.config = config or {}
+        self.name = "BaseAriaAgent"
+        self.description = "Base class for all Aria agents"
+        self.capabilities = []
+        self.logger = logging.getLogger(f"aria.{self.agent_id}")
+
     @abstractmethod
-    def get_capabilities(self) -> List[str]:
-        """Return list of capability keywords this agent handles"""
+    def execute(self, *args, **kwargs):
+        """Execute agent functionality"""
         pass
-        
+
     @abstractmethod
-    def execute(self, task: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Execute the agent's main functionality"""
+    def respond(self, message: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate response to a message"""
         pass
-        
+
     @abstractmethod
     def get_agent_type(self) -> str:
-        """Return the agent type identifier"""
+        """Return the agent type"""
         pass
-        
-    def log_info(self, message: str):
-        """Log info message with agent context"""
-        logger.info(f"[{self.get_agent_type()}][Agent-{self.agent_id}] {message}")
-        
-    def log_error(self, message: str):
-        """Log error message with agent context"""
-        logger.error(f"[{self.get_agent_type()}][Agent-{self.agent_id}] {message}")
+
+    def get_capabilities(self) -> List[str]:
+        """Return agent capabilities"""
+        return self.capabilities

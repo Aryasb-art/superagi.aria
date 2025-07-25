@@ -1,0 +1,49 @@
+
+agent_name: "AriaEmotionAgent"
+agent_description: "Advanced emotion detection, analysis, and regulation system for comprehensive emotional intelligence"
+agent_type: "emotion_analysis"
+version: "1.0.0"
+
+capabilities:
+  - "emotion_detection"
+  - "sentiment_analysis"
+  - "mood_tracking"
+  - "emotion_regulation"
+  - "emotional_intelligence"
+  - "affective_computing"
+  - "pattern_recognition"
+  - "therapeutic_suggestions"
+
+configuration:
+  max_emotion_history: 1000
+  sentiment_analysis_depth: "standard"
+  regulation_timeout: 3600
+  confidence_threshold: 0.5
+  emotional_stability_window: 50
+
+dependencies:
+  - "base_aria_agent"
+  - "logger"
+  - "datetime"
+
+resources:
+  memory_usage: "medium"
+  cpu_usage: "low"
+  priority: "high"
+
+emotion_categories:
+  - "joy"
+  - "sadness"
+  - "anger"
+  - "fear"
+  - "surprise"
+  - "disgust"
+  - "trust"
+  - "anticipation"
+  - "neutral"
+
+regulation_approaches:
+  - "intensive_regulation"
+  - "calming_regulation"
+  - "activation_regulation"
+  - "maintenance_regulation"

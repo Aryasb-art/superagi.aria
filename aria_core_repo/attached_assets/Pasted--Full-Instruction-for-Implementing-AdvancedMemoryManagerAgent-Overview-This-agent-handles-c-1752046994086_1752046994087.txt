@@ -1,0 +1,94 @@
+# ✅ Full Instruction for Implementing AdvancedMemoryManagerAgent
+
+# Overview:
+# This agent handles classification, storage, access control, and summarization
+# of memory data across all other agents. It supports memory types: short-term,
+# long-term, mission-specific, and reflective memory. 
+
+# -----------------------------------------------------------------------------
+
+# 📁 Create file: agents/advanced_memory_manager_agent.py
+
+from base_agent import BaseAgent
+from utils.memory_utils import classify_memory_type, summarize_memory
+from datetime import datetime
+
+class AdvancedMemoryManagerAgent(BaseAgent):
+    def __init__(self):
+        super().__init__('AdvancedMemoryManagerAgent')
+        self.memory_store = {
+            "short_term": [],
+            "long_term": [],
+            "mission_specific": {},
+            "reflective": []
+        }
+
+    def analyze_and_store(self, memory_entry):
+        m_type = classify_memory_type(memory_entry)
+        if m_type == "mission_specific":
+            key = memory_entry.get("mission_id", "general")
+            self.memory_store["mission_specific"].setdefault(key, []).append(memory_entry)
+        else:
+            self.memory_store[m_type].append(memory_entry)
+        return {"status": "stored", "type": m_type}
+
+    def retrieve(self, m_type, mission_id=None):
+        if m_type == "mission_specific":
+            return self.memory_store[m_type].get(mission_id, [])
+        return self.memory_store.get(m_type, [])
+
+    def summarize(self, m_type):
+        data = self.retrieve(m_type)
+        return summarize_memory(data)
+
+    def purge(self, m_type, older_than=None):
+        if m_type == "mission_specific":
+            for k in list(self.memory_store[m_type]):
+                self.memory_store[m_type][k] = [m for m in self.memory_store[m_type][k] if m['timestamp'] > older_than]
+        else:
+            self.memory_store[m_type] = [m for m in self.memory_store[m_type] if m['timestamp'] > older_than]
+        return {"status": "purged"}
+
+# -----------------------------------------------------------------------------
+
+# 📁 Add to agents/master_agent.py initialization:
+# from agents.advanced_memory_manager_agent import AdvancedMemoryManagerAgent
+# self.advanced_memory_manager = AdvancedMemoryManagerAgent()
+
+# -----------------------------------------------------------------------------
+
+# 📁 Add API endpoints in main.py
+from agents.advanced_memory_manager_agent import AdvancedMemoryManagerAgent
+memory_agent = AdvancedMemoryManagerAgent()
+
+@app.post("/agent/memory/analyze")
+def analyze_memory(entry: dict):
+    return memory_agent.analyze_and_store(entry)
+
+@app.get("/agent/memory/retrieve/{m_type}")
+def get_memory(m_type: str):
+    return memory_agent.retrieve(m_type)
+
+@app.get("/agent/memory/summarize/{m_type}")
+def summarize_memory_type(m_type: str):
+    return memory_agent.summarize(m_type)
+
+@app.delete("/agent/memory/purge/{m_type}")
+def purge_memory(m_type: str):
+    return memory_agent.purge(m_type, older_than=datetime.utcnow())
+
+# -----------------------------------------------------------------------------
+
+# ✅ Persian UI Integration Suggestion (frontend/index.html):
+# Add memory management section with input and buttons for analyze, retrieve, summarize
+# از تجزیه و تحلیل حافظه ها و خلاصه سازی استفاده کن.
+
+# -----------------------------------------------------------------------------
+
+# 🔁 Make sure utils/memory_utils.py has the functions:
+# - classify_memory_type(text) -> str
+# - summarize_memory(list_of_memories) -> str
+
+# -----------------------------------------------------------------------------
+
+# ✅ Once this is integrated, test all endpoints and track performance. Then move to agent caching or lazy loading if necessary.

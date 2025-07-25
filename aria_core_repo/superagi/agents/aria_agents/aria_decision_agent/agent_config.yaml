@@ -1,0 +1,86 @@
+name: "AriaDecisionAgent"
+description: "Comprehensive multi-dimensional decision analysis agent"
+version: "1.0.0"
+author: "AriaRobot Team"
+license: "MIT"
+
+agent_config:
+  type: "analysis"
+  category: "decision_support"
+  priority: "high"
+  
+  capabilities:
+    - "multi_dimensional_analysis"
+    - "goal_alignment"
+    - "emotional_assessment"
+    - "risk_analysis"
+    - "openai_integration"
+    - "postgresql_integration"
+    - "persian_decisions"
+  
+  languages:
+    - "persian"
+    - "english"
+  
+  memory:
+    short_term_limit: 10
+    supports_long_term: true
+    memory_types: ["decisions", "analysis", "recommendations"]
+  
+  dependencies:
+    - "base_agent"
+    - "openai"
+    - "postgresql"
+    - "sqlalchemy"
+    - "logging"
+  
+  routing_keywords:
+    - "decision"
+    - "choice"
+    - "تصمیم"
+    - "انتخاب"
+    - "تحلیل"
+    - "بررسی"
+
+runtime:
+  auto_start: true
+  restart_on_failure: true
+  timeout: 60
+
+openai:
+  model: "gpt-4o"
+  max_tokens: 800
+  temperature: 0.3
+
+risk_levels:
+  - "low"
+  - "medium"
+  - "high"
+
+recommendation_types:
+  - "proceed"
+  - "caution"
+  - "stop"
+
+database:
+  table_name: "decision_support"
+  fields:
+    - "id"
+    - "user_id"
+    - "decision_text"
+    - "goal_alignment"
+    - "emotional_state"
+    - "risk_level"
+    - "confidence_score"
+    - "recommendation"
+    - "analysis_data"
+    - "created_at"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+integration:
+  database_required: true
+  openai_required: true
+  external_apis: ["openai"]

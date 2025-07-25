@@ -1,0 +1,55 @@
+من می‌خواهم یک ایجنت جدید به نام SelfAwarenessAgent ایجاد کنم که بتواند وضعیت ذهنی، سطح خودآگاهی و تطابق گفتار با اهداف و احساسات را تحلیل کند. لطفاً فایل agents/self_awareness_agent.py را ایجاد کن و موارد زیر را پیاده‌سازی کن:
+
+1. ایجاد جدول PostgreSQL با نام self_awareness_logs با ستون‌های زیر:
+   - id (PRIMARY KEY)
+   - timestamp (default: now)
+   - status (TEXT)
+   - alert (TEXT)
+   - confidence (FLOAT)
+   - related_memory (TEXT)
+
+2. ایجاد تابع analyze_self_awareness در فایل self_awareness_agent.py که با استفاده از:
+   - GPT-4o
+   - اتصال به حافظه‌های کوتاه‌مدت و بلندمدت
+   - استفاده از خروجی‌های GoalInferenceAgent، EmotionRegulationAgent، ConceptualMemoryAgent و RepetitiveLearningAgent
+   بتواند تشخیص دهد آیا کاربر در مسیر هدفش هست یا دچار انحراف، خستگی ذهنی، بی‌انگیزگی یا تضاد شده است.
+
+3. خروجی این تابع باید در قالب JSON با ساختار زیر باشد:
+   {
+     "status": "ok" | "warning" | "alert",
+     "confidence": 0.0 – 1.0,
+     "alert": "متن هشدار یا پیشنهاد",
+     "related_memory": "خاطره یا هدف مرتبط"
+   }
+
+4. سطح‌بندی وضعیت خودآگاهی:
+   - status = "ok" → بدون مشکل
+   - status = "warning" → احتمال خستگی یا بی‌تمرکزی
+   - status = "alert" → نیاز فوری به تنظیم مسیر
+
+5. تعریف endpointهای زیر در main.py:
+   - POST /agent/self-awareness/analyze
+   - GET /agent/self-awareness/logs
+
+6. اتصال خودکار این ایجنت به MasterAgent برای routing هوشمند هنگام مشاهده عبارات کلیدی مانند:
+   - "احساس خستگی دارم"
+   - "نمی‌دونم دارم چی کار می‌کنم"
+   - "هدفی که داشتم چی بود؟"
+   - "انگیزه‌ام از بین رفته"
+
+7. پیاده‌سازی کامل UI:
+   - یک textarea برای ورود متن وضعیت ذهنی
+   - دکمه: «تحلیل خودآگاهی»
+   - نمایش نتیجه با رنگ‌بندی سبز (ok)، زرد (warning)، قرمز (alert)
+   - نمایش درصد اطمینان و توصیه‌های تنظیم مسیر ذهنی
+
+8. در صورت قطع بودن API، از fallback pattern detection استفاده کن تا تحلیل ساده محلی انجام شود.
+
+9. تست نهایی را با ۵ ورودی مختلف انجام بده:
+   - اعتمادبه‌نفس
+   - بی‌انگیزگی
+   - انحراف از هدف
+   - ورودی خنثی
+   - تضاد تصمیم‌گیری
+
+در پایان اطمینان حاصل کن که این ایجنت در کنار سایر ایجنت‌های فعال سیستم من (Utility, Tool, Summary, LongTermMemory, ConceptualMemory, RepetitiveLearning, KnowledgeGraph, AutoSuggester, GoalInference, EmotionRegulation) به درستی کار می‌کند.

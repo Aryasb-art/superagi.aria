@@ -1,0 +1,68 @@
+name: "AriaUtilityAgent"
+description: "Agent for text processing, summarization, and translation using OpenAI GPT"
+version: "1.0.0"
+author: "AriaRobot Team"
+license: "MIT"
+
+# Agent configuration
+agent_config:
+  type: "utility"
+  category: "text_processing"
+  priority: "medium"
+  
+  # Capabilities
+  capabilities:
+    - "text_summarization"
+    - "language_translation"
+    - "text_improvement"
+    - "persian_english_translation"
+    - "openai_integration"
+  
+  # Language support
+  languages:
+    - "persian"
+    - "english"
+  
+  # Memory configuration
+  memory:
+    short_term_limit: 10
+    supports_long_term: false
+    memory_types: ["text_processing", "translation"]
+  
+  # Dependencies
+  dependencies:
+    - "base_agent"
+    - "openai"
+    - "logging"
+  
+  # Routing keywords
+  routing_keywords:
+    - "translate"
+    - "summarize"
+    - "improve"
+    - "ترجمه"
+    - "خلاصه"
+    - "بهبود"
+
+# Runtime configuration
+runtime:
+  auto_start: true
+  restart_on_failure: true
+  timeout: 30
+  
+# OpenAI configuration
+openai:
+  model: "gpt-4o"
+  max_tokens: 500
+  temperature: 0.3
+  
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+# Integration settings
+integration:
+  database_required: false
+  openai_required: true
+  external_apis: ["openai"]
