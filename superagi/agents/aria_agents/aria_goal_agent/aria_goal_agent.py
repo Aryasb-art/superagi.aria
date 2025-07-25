@@ -50,31 +50,51 @@ class AriaGoalAgent(BaseAriaAgent):
             "goal_tracking"
         ]
 
-    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, task, context=None, config=None) -> Dict[str, Any]:
         """
         Execute goal-related tasks
 
         Args:
-            task: Dictionary containing task information
+            task: Dictionary containing task information or string
+            context: Optional context dictionary
+            config: Optional configuration dictionary
 
         Returns:
             Dictionary containing execution results
         """
         try:
-            task_type = task.get('type', 'analyze_goal')
+            # Handle both string and dict task inputs
+            if isinstance(task, str):
+                task_dict = {
+                    'type': 'analyze_goal',
+                    'input': task,
+                    'description': task
+                }
+            else:
+                task_dict = task or {}
+            
+            # Merge context if provided
+            if context:
+                task_dict['context'] = context
+                
+            # Apply config if provided
+            if config:
+                task_dict.update(config)
+            
+            task_type = task_dict.get('type', 'analyze_goal')
 
             if task_type == 'detect_goal':
-                return self._detect_goal(task)
+                return self._detect_goal(task_dict)
             elif task_type == 'analyze_intent':
-                return self._analyze_intent(task)
+                return self._analyze_intent(task_dict)
             elif task_type == 'plan_goal':
-                return self._plan_goal(task)
+                return self._plan_goal(task_dict)
             elif task_type == 'track_progress':
-                return self._track_progress(task)
+                return self._track_progress(task_dict)
             elif task_type == 'assess_motivation':
-                return self._assess_motivation(task)
+                return self._assess_motivation(task_dict)
             else:
-                return self._general_goal_analysis(task)
+                return self._general_goal_analysis(task_dict)
 
         except Exception as e:
             logger.error(f"AriaGoalAgent execution error: {str(e)}")
