@@ -171,3 +171,4 @@ boto3
 openai
 tenacity
 reportlab
+beautifulsoup4
