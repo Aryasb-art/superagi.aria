@@ -1,5 +1,5 @@
 modules = ["python-3.12", "nodejs-20", "web", "bash"]
-run = "python main.py"
+run = "uvicorn main:app --host 0.0.0.0 --port 8000"
 
 [nix]
 channel = "stable-24_05"

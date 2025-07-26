@@ -181,12 +181,12 @@ async def execute_aria_agent(request_data: dict):
         }
 
 # Serve static files from the "gui/persian_ui" directory
-app.mount("/persian_ui", StaticFiles(directory="gui/persian_ui"), name="persian_ui")
+app.mount("/static", StaticFiles(directory="gui/persian_ui", html=True), name="static")
 
 # Define a route to serve the index.html file
 @app.get("/")
 async def read_root():
-    return RedirectResponse("/persian_ui/index.html")
+    return RedirectResponse("/static/index.html")
 
 # in production you can use Settings management
 # from pydantic to get secret key from .env
@@ -463,5 +463,9 @@ def get_env():
     env = get_config('ENV', 'DEV')
     return {"env": env}
 
-# # __________________TO RUN____________________________
-# # uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+# __________________TO RUN____________________________
+# uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
