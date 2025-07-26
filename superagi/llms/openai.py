@@ -1,6 +1,16 @@
 import openai
-from openai import APIError, InvalidRequestError
-from openai.error import RateLimitError, AuthenticationError, Timeout, TryAgain
+from openai import OpenAI
+try:
+    # Try new OpenAI v1+ API structure
+    from openai import APIError
+    from openai import AuthenticationError
+    from openai import RateLimitError
+    from openai import APITimeoutError as Timeout
+    from openai import APIConnectionError as TryAgain
+    from openai import BadRequestError as InvalidRequestError
+except ImportError:
+    # Fallback to old API structure
+    from openai.error import APIError, InvalidRequestError, RateLimitError, AuthenticationError, Timeout, TryAgain
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_random_exponential
 
 from superagi.config.config import get_config
