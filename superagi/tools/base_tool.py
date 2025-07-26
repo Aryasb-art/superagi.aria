@@ -243,9 +243,6 @@ class BaseToolkit(BaseModel):
     def get_env_keys(self) -> List[str]:
         # Add file related config keys here
         pass
-
-```# Fix: Modified BaseTool to include type annotations for name and description to be compatible with Pydantic v2.
-from abc import abstractmethod
 from functools import wraps
 from inspect import signature
 from typing import List
