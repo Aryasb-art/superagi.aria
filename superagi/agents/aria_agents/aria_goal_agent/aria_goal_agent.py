@@ -12,17 +12,7 @@ from superagi.lib.logger import logger
 class AriaGoalAgent(BaseAriaAgent):
     """
     Aria Goal Agent - Handles goal setting, tracking, and achievement
-    """
-
-    def __init__(self, session, agent_id, agent_config=None):
-        super().__init__(session, agent_id, agent_config)
-        self.config = self._load_config()
-
-    def get_agent_type(self) -> str:
-        """Return agent type"""
-        return "AriaGoalAgent"
-
-    """
+    
     AriaGoalAgent handles comprehensive goal processing including:
     - Goal detection and recognition
     - Intent analysis and categorization
@@ -31,8 +21,8 @@ class AriaGoalAgent(BaseAriaAgent):
     - Behavioral pattern analysis
     """
 
-    def __init__(self, llm, agent_id: int, agent_execution_id: int = None):
-        super().__init__(llm, agent_id, agent_execution_id)
+    def __init__(self, session, agent_id, agent_config=None):
+        super().__init__(session, agent_id, agent_config)
         self.agent_name = "AriaGoalAgent"
         self.goal_history = []
         self.current_goals = []
@@ -43,6 +33,10 @@ class AriaGoalAgent(BaseAriaAgent):
             "learning/knowledge", "health/wellness", "relationship/social",
             "career/work", "general/other"
         ]
+
+    def get_agent_type(self) -> str:
+        """Return agent type"""
+        return "AriaGoalAgent"
 
     def get_capabilities(self) -> List[str]:
         """Return the capabilities of this agent"""
@@ -56,31 +50,51 @@ class AriaGoalAgent(BaseAriaAgent):
             "goal_tracking"
         ]
 
-    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, task, context=None, config=None) -> Dict[str, Any]:
         """
         Execute goal-related tasks
 
         Args:
-            task: Dictionary containing task information
+            task: Dictionary containing task information or string
+            context: Optional context dictionary
+            config: Optional configuration dictionary
 
         Returns:
             Dictionary containing execution results
         """
         try:
-            task_type = task.get('type', 'analyze_goal')
+            # Handle both string and dict task inputs
+            if isinstance(task, str):
+                task_dict = {
+                    'type': 'analyze_goal',
+                    'input': task,
+                    'description': task
+                }
+            else:
+                task_dict = task or {}
+            
+            # Merge context if provided
+            if context:
+                task_dict['context'] = context
+                
+            # Apply config if provided
+            if config:
+                task_dict.update(config)
+            
+            task_type = task_dict.get('type', 'analyze_goal')
 
             if task_type == 'detect_goal':
-                return self._detect_goal(task)
+                return self._detect_goal(task_dict)
             elif task_type == 'analyze_intent':
-                return self._analyze_intent(task)
+                return self._analyze_intent(task_dict)
             elif task_type == 'plan_goal':
-                return self._plan_goal(task)
+                return self._plan_goal(task_dict)
             elif task_type == 'track_progress':
-                return self._track_progress(task)
+                return self._track_progress(task_dict)
             elif task_type == 'assess_motivation':
-                return self._assess_motivation(task)
+                return self._assess_motivation(task_dict)
             else:
-                return self._general_goal_analysis(task)
+                return self._general_goal_analysis(task_dict)
 
         except Exception as e:
             logger.error(f"AriaGoalAgent execution error: {str(e)}")

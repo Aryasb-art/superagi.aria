@@ -202,6 +202,35 @@ class AriaController:
                 return False
         return False
     
+    def execute_chain(self, initial_task: str, 
+                     chain_config: Optional[List[Dict]] = None,
+                     context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Execute a chain of agents in sequence
+        
+        Args:
+            initial_task: Initial task to process
+            chain_config: Chain configuration
+            context: Additional context
+            
+        Returns:
+            Dict with chain execution results
+        """
+        try:
+            # Import here to avoid circular import
+            from superagi.agents.aria_agents.aria_agent_chain import AriaAgentChain
+            
+            chain = AriaAgentChain(self.session)
+            return chain.execute_chain(initial_task, chain_config, context)
+            
+        except Exception as e:
+            self.logger.error(f"Chain execution error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+    
     def shutdown_all(self) -> Dict[str, bool]:
         """Shutdown all active agents"""
         results = {}

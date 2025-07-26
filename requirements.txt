@@ -164,3 +164,11 @@ llama_cpp_python==0.2.7
 requests
 psycopg2-binary
 sqlalchemy
+boto3
+jose
+passlib
+boto3
+openai
+tenacity
+reportlab
+beautifulsoup4

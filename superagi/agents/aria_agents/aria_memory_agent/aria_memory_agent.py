@@ -53,31 +53,51 @@ class AriaMemoryAgent(BaseAriaAgent):
         """
         return "AriaMemoryAgent"
 
-    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, task, context=None, config=None) -> Dict[str, Any]:
         """
         Execute memory-related tasks
 
         Args:
-            task: Dictionary containing task information
+            task: Dictionary containing task information or string
+            context: Optional context dictionary
+            config: Optional configuration dictionary
 
         Returns:
             Dictionary containing execution results
         """
         try:
-            task_type = task.get('type', 'general_memory')
+            # Handle both string and dict task inputs
+            if isinstance(task, str):
+                task_dict = {
+                    'type': 'general_memory',
+                    'data': task,
+                    'description': task
+                }
+            else:
+                task_dict = task or {}
+            
+            # Merge context if provided
+            if context:
+                task_dict['context'] = context
+                
+            # Apply config if provided
+            if config:
+                task_dict.update(config)
+            
+            task_type = task_dict.get('type', 'general_memory')
 
             if task_type == 'store_memory':
-                return self._store_memory(task)
+                return self._store_memory(task_dict)
             elif task_type == 'retrieve_memory':
-                return self._retrieve_memory(task)
+                return self._retrieve_memory(task_dict)
             elif task_type == 'search_memory':
-                return self._search_memory(task)
+                return self._search_memory(task_dict)
             elif task_type == 'compress_memory':
-                return self._compress_memory(task)
+                return self._compress_memory(task_dict)
             elif task_type == 'cleanup_memory':
-                return self._cleanup_memory(task)
+                return self._cleanup_memory(task_dict)
             else:
-                return self._general_memory_task(task)
+                return self._general_memory_task(task_dict)
 
         except Exception as e:
             logger.error(f"AriaMemoryAgent execution error: {str(e)}")

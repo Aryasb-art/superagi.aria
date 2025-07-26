@@ -56,12 +56,14 @@ class AriaEmotionAgent(BaseAriaAgent):
             "affective_computing"
         ]
 
-    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, task: Dict[str, Any], context=None, config=None) -> Dict[str, Any]:
         """
         Execute emotion-related tasks
 
         Args:
             task: Dictionary containing task information
+            context: Optional context dictionary
+            config: Optional configuration dictionary
 
         Returns:
             Dictionary containing execution results

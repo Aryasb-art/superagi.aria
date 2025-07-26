@@ -27,46 +27,58 @@ class AriaToolAgent(BaseAriaAgent):
     def get_agent_type(self) -> str:
         return "AriaToolAgent"
 
-    def execute(self, task: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute(self, task, context=None, config=None) -> Dict[str, Any]:
         """
         Execute tool-based tasks with comprehensive processing
         
         Args:
-            task (str): The task to execute
-            context (Dict): Optional context containing task parameters and tools
+            task: The task to execute (string or dict)
+            context: Optional context containing task parameters and tools
+            config: Optional configuration dictionary
             
         Returns:
             Dict: Task execution result with detailed output
         """
         try:
-            self.log(f"Executing tool task: {task}")
+            # Handle both string and dict task inputs
+            if isinstance(task, str):
+                task_str = task
+                task_context = context or {}
+            else:
+                task_str = task.get('description', str(task)) if isinstance(task, dict) else str(task)
+                task_context = context or {}
+                if isinstance(task, dict):
+                    task_context.update(task)
             
-            if not context:
-                context = {}
+            # Apply config if provided
+            if config:
+                task_context.update(config)
             
-            task_type = context.get('task_type', 'general')
-            tools = context.get('tools', [])
-            parameters = context.get('parameters', {})
+            logger.info(f"AriaToolAgent executing tool task: {task_str}")
+            
+            task_type = task_context.get('task_type', 'general')
+            tools = task_context.get('tools', [])
+            parameters = task_context.get('parameters', {})
             
             result = None
             
             if task_type == 'workflow':
-                result = self._execute_workflow(task, context)
+                result = self._execute_workflow(task_str, task_context)
             elif task_type == 'data_processing':
-                result = self._process_data(task, context)
+                result = self._process_data(task_str, task_context)
             elif task_type == 'api_call':
-                result = self._handle_api_call(task, context)
+                result = self._handle_api_call(task_str, task_context)
             elif task_type == 'file_operation':
-                result = self._handle_file_operation(task, context)
+                result = self._handle_file_operation(task_str, task_context)
             elif task_type == 'automation':
-                result = self._handle_automation(task, context)
+                result = self._handle_automation(task_str, task_context)
             else:
-                result = self._general_tool_execution(task, context)
+                result = self._general_tool_execution(task_str, task_context)
             
             execution_result = {
                 "success": True,
                 "result": result,
-                "task": task,
+                "task": task_str,
                 "task_type": task_type,
                 "tools_used": tools,
                 "execution_time": time.time(),
@@ -74,18 +86,18 @@ class AriaToolAgent(BaseAriaAgent):
                 "agent": self.get_agent_type()
             }
             
-            self.remember(f"Completed tool task: {task}")
+            logger.info(f"AriaToolAgent completed tool task: {task_str}")
             return execution_result
             
         except Exception as e:
             error_result = {
                 "success": False,
                 "error": str(e),
-                "task": task,
+                "task": str(task),
                 "timestamp": datetime.utcnow().isoformat(),
                 "agent": self.get_agent_type()
             }
-            self.log(f"Error executing tool task: {str(e)}", "error")
+            logger.error(f"AriaToolAgent error executing tool task: {str(e)}")
             return error_result
 
     def _execute_workflow(self, task: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -104,7 +116,7 @@ class AriaToolAgent(BaseAriaAgent):
                     "result": step_result,
                     "success": True
                 })
-                self.log(f"Completed workflow step {i + 1}: {step.get('description', 'Unnamed step')}")
+                logger.info(f"Completed workflow step {i + 1}: {step.get('description', 'Unnamed step')}")
             except Exception as e:
                 results.append({
                     "step": i + 1,
@@ -112,7 +124,7 @@ class AriaToolAgent(BaseAriaAgent):
                     "error": str(e),
                     "success": False
                 })
-                self.log(f"Failed workflow step {i + 1}: {str(e)}", "error")
+                logger.error(f"Failed workflow step {i + 1}: {str(e)}")
                 break
         
         return {

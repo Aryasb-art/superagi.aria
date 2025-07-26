@@ -27,6 +27,58 @@ class AriaUtilityAgent(BaseAriaAgent):
     def get_agent_type(self) -> str:
         return "AriaUtilityAgent"
 
+    def execute(self, task, context=None, config=None) -> Dict[str, Any]:
+        """
+        Execute utility tasks with comprehensive processing
+        
+        Args:
+            task: The task to execute (string or dict)
+            context: Optional context dictionary
+            config: Optional configuration dictionary
+            
+        Returns:
+            Dict: Task execution result
+        """
+        try:
+            # Handle both string and dict task inputs
+            if isinstance(task, str):
+                task_dict = {
+                    'type': 'utility_task',
+                    'input': task,
+                    'description': task
+                }
+            else:
+                task_dict = task or {}
+            
+            # Merge context if provided
+            if context:
+                task_dict['context'] = context
+                
+            # Apply config if provided
+            if config:
+                task_dict.update(config)
+            
+            # Process the utility task
+            result = {
+                "success": True,
+                "message": "Utility task processed successfully",
+                "task": task_dict.get('description', str(task)),
+                "processed_data": task_dict,
+                "timestamp": datetime.utcnow().isoformat(),
+                "agent": self.get_agent_type()
+            }
+            
+            return result
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "task": str(task),
+                "timestamp": datetime.utcnow().isoformat(),
+                "agent": self.get_agent_type()
+            }
+
     def execute(self, task: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Execute utility tasks

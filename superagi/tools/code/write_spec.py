@@ -41,8 +41,8 @@ class WriteSpecTool(BaseTool):
     llm: Optional[BaseLlm] = None
     agent_id: int = None
     agent_execution_id: int = None
-    name = "WriteSpecTool"
-    description = (
+    name: str = "WriteSpecTool"
+    description: str = (
         "A tool to write the spec of a program."
     )
     args_schema: Type[WriteSpecSchema] = WriteSpecSchema

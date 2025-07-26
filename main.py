@@ -3,8 +3,9 @@ from fastapi import FastAPI, HTTPException, Depends, Request, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
-from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
+from passlib.context import CryptContext
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from pydantic import BaseModel
 from sqlalchemy import create_engine
@@ -60,6 +61,9 @@ from superagi.models.workflows.agent_workflow import AgentWorkflow
 from superagi.models.workflows.iteration_workflow import IterationWorkflow
 from superagi.models.workflows.iteration_workflow_step import IterationWorkflowStep
 from urllib.parse import urlparse
+from fastapi.staticfiles import StaticFiles
+import os
+
 app = FastAPI()
 
 db_host = get_config('DB_HOST', 'super__postgres')
@@ -137,38 +141,90 @@ app.include_router(api_key_router, prefix="/api-keys")
 app.include_router(api_agent_router,prefix="/v1/agent")
 app.include_router(web_hook_router,prefix="/webhook")
 
-# in production you can use Settings management
-# from pydantic to get secret key from .env
-class Settings(BaseModel):
-    # jwt_secret = get_config("JWT_SECRET_KEY")
-    authjwt_secret_key: str = superagi.config.config.get_config("JWT_SECRET_KEY")
+from superagi.agents.aria_agents.aria_controller import AriaController
 
+# API endpoint for Aria agents
+@app.post('/api/execute_agent')
+async def execute_aria_agent(request_data: dict):
+    """Execute Aria agent with user input"""
+    try:
+        message = request_data.get('message', '')
+        agent_type = request_data.get('agent_type', 'AriaGoalAgent')
 
-def create_access_token(email, Authorize: AuthJWT = Depends()):
-    expiry_time_hours = superagi.config.config.get_config("JWT_EXPIRY")
+        if not message:
+            raise HTTPException(status_code=400, detail="پیام نمی‌تواند خالی باشد")
+
+        # Initialize controller
+        controller = AriaController(db.session)
+
+        # Create and execute agent
+        agent = controller.create_agent(agent_type)
+        if not agent:
+            raise HTTPException(status_code=500, detail=f"خطا در ایجاد ایجنت {agent_type}")
+
+        # Execute task
+        result = agent.execute_task(message)
+
+        return {
+            "success": True,
+            "agent_type": agent_type,
+            "message": message,
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Error executing Aria agent: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+# Serve static files from the "gui/persian_ui" directory
+app.mount("/static", StaticFiles(directory="gui/persian_ui", html=True), name="static")
+
+# Define a route to serve the index.html file
+@app.get("/")
+async def read_root():
+    return RedirectResponse("/static/index.html")
+
+# JWT Configuration
+SECRET_KEY = get_config("JWT_SECRET_KEY", "your-secret-key-here")
+ALGORITHM = "HS256"
+
+def create_access_token(email: str):
+    expiry_time_hours = get_config("JWT_EXPIRY", "200")
     if type(expiry_time_hours) == str:
         expiry_time_hours = int(expiry_time_hours)
     if expiry_time_hours is None:
         expiry_time_hours = 200
-    expires = timedelta(hours=expiry_time_hours)
-    access_token = Authorize.create_access_token(subject=email, expires_time=expires)
-    return access_token
+    
+    expires = datetime.utcnow() + timedelta(hours=expiry_time_hours)
+    to_encode = {"sub": email, "exp": expires}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            return None
+        return email
+    except JWTError:
+        return None
 
-# callback to get your configuration
-@AuthJWT.load_config
-def get_config():
-    return Settings()
-
-
-# exception handler for authjwt
-# in production, you can tweak performance using orjson response
-@app.exception_handler(AuthJWTException)
-def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.message}
-    )
+def get_current_user(authorization: str = None):
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    
+    token = authorization.split(" ")[1]
+    email = verify_token(token)
+    if email:
+        user = db.session.query(User).filter(User.email == email).first()
+        return user
+    return None
 
 
 def replace_old_iteration_workflows(session):
@@ -249,7 +305,7 @@ async def startup_event():
 
 
 @app.post('/login')
-def login(request: LoginRequest, Authorize: AuthJWT = Depends()):
+def login(request: LoginRequest):
     """Login API for email and password based login"""
 
     email_to_find = request.email
@@ -259,7 +315,7 @@ def login(request: LoginRequest, Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=401, detail="Bad username or password")
 
     # subject identifier for who this token is for example id or username from database
-    access_token = create_access_token(user.email, Authorize)
+    access_token = create_access_token(user.email)
     return {"access_token": access_token}
 
 
@@ -276,7 +332,7 @@ def github_login():
 
 
 @app.get('/github-auth')
-def github_auth_handler(code: str = Query(...), Authorize: AuthJWT = Depends()):
+def github_auth_handler(code: str = Query(...)):
     """GitHub login callback"""
 
     github_token_url = 'https://github.com/login/oauth/access_token'
@@ -308,14 +364,14 @@ def github_auth_handler(code: str = Query(...), Authorize: AuthJWT = Depends()):
                 user_email = user_data["login"] + "@github.com"
             db_user: User = db.session.query(User).filter(User.email == user_email).first()
             if db_user is not None:
-                jwt_token = create_access_token(user_email, Authorize)
+                jwt_token = create_access_token(user_email)
                 redirect_url_success = f"{frontend_url}?access_token={jwt_token}&first_time_login={False}"
                 return RedirectResponse(url=redirect_url_success)
 
             user = User(name=user_data["name"], email=user_email)
             db.session.add(user)
             db.session.commit()
-            jwt_token = create_access_token(user_email, Authorize)
+            jwt_token = create_access_token(user_email)
             redirect_url_success = f"{frontend_url}?access_token={jwt_token}&first_time_login={True}"
             return RedirectResponse(url=redirect_url_success)
         else:
@@ -327,29 +383,27 @@ def github_auth_handler(code: str = Query(...), Authorize: AuthJWT = Depends()):
 
 
 @app.get('/user')
-def user(Authorize: AuthJWT = Depends()):
+def user(authorization: str = Depends(lambda request: request.headers.get("Authorization"))):
     """API to get current logged in User"""
 
-    Authorize.jwt_required()
-    current_user = Authorize.get_jwt_subject()
-    return {"user": current_user}
+    current_user = get_current_user(authorization)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return {"user": current_user.email}
 
 
 @app.get("/validate-access-token")
-async def root(Authorize: AuthJWT = Depends()):
+async def root(authorization: str = Depends(lambda request: request.headers.get("Authorization"))):
     """API to validate access token"""
 
-    try:
-        Authorize.jwt_required()
-        current_user_email = Authorize.get_jwt_subject()
-        current_user = db.session.query(User).filter(User.email == current_user_email).first()
-        return current_user
-    except:
+    current_user = get_current_user(authorization)
+    if not current_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    return current_user
 
 
 @app.post("/validate-llm-api-key")
-async def validate_llm_api_key(request: ValidateAPIKeyRequest, Authorize: AuthJWT = Depends()):
+async def validate_llm_api_key(request: ValidateAPIKeyRequest):
     """API to validate LLM API Key"""
     source = request.model_source
     api_key = request.model_api_key
@@ -362,7 +416,7 @@ async def validate_llm_api_key(request: ValidateAPIKeyRequest, Authorize: AuthJW
 
 
 @app.get("/validate-open-ai-key/{open_ai_key}")
-async def root(open_ai_key: str, Authorize: AuthJWT = Depends()):
+async def root(open_ai_key: str):
     """API to validate Open AI Key"""
 
     try:
@@ -374,8 +428,10 @@ async def root(open_ai_key: str, Authorize: AuthJWT = Depends()):
 
 # #Unprotected route
 @app.get("/hello/{name}")
-async def say_hello(name: str, Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
+async def say_hello(name: str, authorization: str = Depends(lambda request: request.headers.get("Authorization"))):
+    current_user = get_current_user(authorization)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     return {"message": f"Hello {name}"}
 
 @app.get('/get/github_client_id')
@@ -412,5 +468,9 @@ def get_env():
     env = get_config('ENV', 'DEV')
     return {"env": env}
 
-# # __________________TO RUN____________________________
-# # uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+# __________________TO RUN____________________________
+# uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

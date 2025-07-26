@@ -1,1442 +1,0 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AriaRobot - رابط کاربری</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'vazir': ['Vazir', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Vazir', sans-serif;
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .chat-message {
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .loading {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Decision support specific styles */
-        .risk-badge.low {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        .risk-badge.medium {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .risk-badge.high {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Header -->
-    <header class="gradient-bg text-white py-6 shadow-lg">
-        <div class="container mx-auto px-4">
-            <h1 class="text-3xl font-bold text-center">AriaRobot</h1>
-            <p class="text-center text-blue-100 mt-2">سیستم هوشمند پردازش پیام و حافظه کوتاه‌مدت</p>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <!-- Chat Interface -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">گفتگو با Agent</h2>
-                
-                <!-- Input Section -->
-                <div class="flex gap-4 mb-4">
-                    <input 
-                        type="text" 
-                        id="messageInput" 
-                        placeholder="پیام خود را اینجا بنویسید..."
-                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        onkeypress="handleKeyPress(event)"
-                    >
-                    <button 
-                        id="sendBtn"
-                        onclick="sendMessage()"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    >
-                        <span>ارسال</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Response Section -->
-                <div id="responseSection" class="hidden">
-                    <h3 class="text-lg font-medium mb-2 text-gray-700">پاسخ Agent:</h3>
-                    <div id="responseContent" class="bg-gray-50 p-4 rounded-lg border-r-4 border-blue-500">
-                        <!-- Response will be displayed here -->
-                    </div>
-                </div>
-
-                <!-- Loading Animation -->
-                <div id="loadingSection" class="hidden flex items-center justify-center py-4">
-                    <div class="loading"></div>
-                    <span class="mr-2 text-gray-600">در حال پردازش...</span>
-                </div>
-            </div>
-
-            <!-- Tool Functions -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">ابزارهای پردازش متن</h2>
-                
-                <!-- Navigation Buttons -->
-                <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-6">
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm" onclick="showSentimentAnalysis()">
-                        💙 احساسات
-                    </button>
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded text-sm" onclick="showSummarization()">
-                        📝 خلاصه
-                    </button>
-                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded text-sm" onclick="showLongTermMemory()">
-                        🧠 حافظه
-                    </button>
-                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded text-sm" onclick="showConceptualMemory()">
-                        💡 مفاهیم
-                    </button>
-                    <button class="bg-pink-500 hover:bg-pink-600 text-white px-3 py-2 rounded text-sm" onclick="showRepetitivePatterns()">
-                        🔄 الگوها
-                    </button>
-                    <button class="bg-teal-500 hover:bg-teal-600 text-white px-3 py-2 rounded text-sm" onclick="showKnowledgeGraph()">
-                        🔗 گراف
-                    </button>
-                    <button class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded text-sm" onclick="showAutoSuggester()">
-                        🚀 پیشنهاد
-                    </button>
-                    <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded text-sm" onclick="showGoalInference()">
-                        🎯 اهداف
-                    </button>
-                    <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm" onclick="showEmotionRegulation()">
-                        ❤️ هیجان
-                    </button>
-                    <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm" onclick="showDecisionSupport()">
-                        🔴 تصمیم
-                    </button>
-                    <button class="bg-purple-700 hover:bg-purple-800 text-white px-3 py-2 rounded text-sm" onclick="showSelfAwareness()">
-                        🧠 خودآگاهی
-                    </button>
-                    <button class="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded text-sm" onclick="showSecurityCheck()">
-                        🛡️ امنیت ذهنی
-                    </button>
-                    <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm" onclick="showRewards()">
-                        🏆 پاداش‌ها
-                    </button>
-                    <button class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded text-sm" onclick="showBiasDetection()">
-                        🧠 سوگیری‌ها
-                    </button>
-                    <button class="bg-pink-600 hover:bg-pink-700 text-white px-3 py-2 rounded text-sm" onclick="showCognitiveDistortion()">
-                        🧠 تحریف‌ها
-                    </button>
-                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-sm" onclick="showEthicalReasoning()">
-                        🧭 اخلاقیات
-                    </button>
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm" onclick="showSimulatedConsensus()">
-                        🤝 تصمیم‌گیری گروهی
-                    </button>
-                    <button class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded text-sm" onclick="showAdvancedMemoryManager()">
-                        🧠 مدیر حافظه
-                    </button>
-                </div>
-                
-                <!-- Bias Detection Section -->
-                <div id="biasDetectionSection" class="hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🧠 Cognitive Bias Detection (تشخیص سوگیری‌های شناختی)</h3>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="mb-4">
-                            <textarea 
-                                id="biasInput" 
-                                placeholder="متن، تصمیم، یا نظر خود را برای تحلیل سوگیری بنویسید..."
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
-                                rows="4"
-                                dir="rtl"
-                            ></textarea>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button 
-                                id="analyzeBiasBtn" 
-                                onclick="analyzeBias()"
-                                class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🔍</span>
-                                <span>تحلیل سوگیری</span>
-                            </button>
-                            <button 
-                                onclick="listBiasLogs()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📋</span>
-                                <span>تاریخچه</span>
-                            </button>
-                            <button 
-                                onclick="clearBiasAnalysis()"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🗑️</span>
-                                <span>پاک کردن</span>
-                            </button>
-                        </div>
-                        <div id="biasLoading" class="hidden">
-                            <div class="flex items-center justify-center py-8">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
-                                <span class="ml-2 text-cyan-600">در حال تحلیل سوگیری...</span>
-                            </div>
-                        </div>
-                        <div id="biasResult" class="hidden">
-                            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                                <h4 class="font-semibold mb-2">نتیجه تحلیل:</h4>
-                                <div id="biasContent" class="text-sm text-gray-700"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Simulated Consensus Section -->
-                <div id="simulatedConsensusSection" class="hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🤝 Simulated Consensus Decision Making (تصمیم‌گیری گروهی شبیه‌سازی شده)</h3>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="mb-4">
-                            <textarea 
-                                id="consensusInput" 
-                                placeholder="تصمیم، معضل، یا موضوع پیچیده‌ای که نیاز به بررسی گروهی دارد را بنویسید..."
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                                rows="4"
-                                dir="rtl"
-                            ></textarea>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button 
-                                id="simulateConsensusBtn" 
-                                onclick="simulateConsensus()"
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🤝</span>
-                                <span>شبیه‌سازی تصمیم‌گیری گروهی</span>
-                            </button>
-                            <button 
-                                onclick="listConsensusLogs()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📋</span>
-                                <span>تاریخچه تصمیمات</span>
-                            </button>
-                            <button 
-                                onclick="clearConsensusAnalysis()"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🗑️</span>
-                                <span>پاک کردن</span>
-                            </button>
-                        </div>
-                        <div id="consensusLoading" class="hidden">
-                            <div class="flex items-center justify-center py-8">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                                <span class="ml-2 text-green-600">در حال شبیه‌سازی تصمیم‌گیری گروهی...</span>
-                            </div>
-                        </div>
-                        <div id="consensusResult" class="hidden">
-                            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                                <h4 class="font-semibold mb-2">نتیجه تصمیم‌گیری گروهی:</h4>
-                                <div id="consensusContent" class="text-sm text-gray-700"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Memory Manager Section -->
-                <div id="advancedMemoryManagerSection" class="hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🧠 Advanced Memory Manager (مدیر پیشرفته حافظه)</h3>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <!-- Memory Operation Type Selection -->
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-                            <button 
-                                id="memoryAnalyzeBtn"
-                                onclick="showMemoryAnalyze()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                                📝 تحلیل و ذخیره
-                            </button>
-                            <button 
-                                id="memoryRetrieveBtn"
-                                onclick="showMemoryRetrieve()"
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                                🔍 بازیابی
-                            </button>
-                            <button 
-                                id="memorySummarizeBtn"
-                                onclick="showMemorySummarize()"
-                                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                                📄 خلاصه‌سازی
-                            </button>
-                            <button 
-                                id="memoryStatsBtn"
-                                onclick="showMemoryStats()"
-                                class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                                📊 آمار
-                            </button>
-                        </div>
-
-                        <!-- Memory Analyze Section -->
-                        <div id="memoryAnalyzeSection" class="mb-6">
-                            <h4 class="text-lg font-medium mb-3 text-gray-700">تحلیل و ذخیره حافظه</h4>
-                            <div class="mb-4">
-                                <textarea 
-                                    id="memoryAnalyzeInput" 
-                                    placeholder="محتوای حافظه را برای تحلیل و ذخیره وارد کنید..."
-                                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                    rows="4"
-                                    dir="rtl"
-                                ></textarea>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">نوع حافظه:</label>
-                                    <select id="memoryTypeSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">انتخاب خودکار</option>
-                                        <option value="short_term">کوتاه‌مدت</option>
-                                        <option value="long_term">بلندمدت</option>
-                                        <option value="mission_specific">ماموریت خاص</option>
-                                        <option value="reflective">بازتابی</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">شناسه ماموریت (اختیاری):</label>
-                                    <input type="text" id="missionIdInput" placeholder="mission_123" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                            <button 
-                                onclick="analyzeMemory()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🔍</span>
-                                <span>تحلیل و ذخیره</span>
-                            </button>
-                        </div>
-
-                        <!-- Memory Retrieve Section -->
-                        <div id="memoryRetrieveSection" class="mb-6 hidden">
-                            <h4 class="text-lg font-medium mb-3 text-gray-700">بازیابی حافظه</h4>
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">نوع حافظه:</label>
-                                    <select id="retrieveTypeSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                                        <option value="short_term">کوتاه‌مدت</option>
-                                        <option value="long_term">بلندمدت</option>
-                                        <option value="mission_specific">ماموریت خاص</option>
-                                        <option value="reflective">بازتابی</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">حداقل اهمیت:</label>
-                                    <input type="number" id="minImportanceInput" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                                </div>
-                            </div>
-                            <button 
-                                onclick="retrieveMemory()"
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🔍</span>
-                                <span>بازیابی حافظه</span>
-                            </button>
-                        </div>
-
-                        <!-- Memory Summarize Section -->
-                        <div id="memorySummarizeSection" class="mb-6 hidden">
-                            <h4 class="text-lg font-medium mb-3 text-gray-700">خلاصه‌سازی حافظه</h4>
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">نوع حافظه:</label>
-                                    <select id="summarizeTypeSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        <option value="short_term">کوتاه‌مدت</option>
-                                        <option value="long_term">بلندمدت</option>
-                                        <option value="mission_specific">ماموریت خاص</option>
-                                        <option value="reflective">بازتابی</option>
-                                    </select>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="forceRefreshCheck" class="mr-2">
-                                    <label for="forceRefreshCheck" class="text-sm font-medium text-gray-700">تولید مجدد اجباری</label>
-                                </div>
-                            </div>
-                            <button 
-                                onclick="summarizeMemory()"
-                                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📄</span>
-                                <span>خلاصه‌سازی</span>
-                            </button>
-                        </div>
-
-                        <!-- Memory Stats Section -->
-                        <div id="memoryStatsSection" class="mb-6 hidden">
-                            <h4 class="text-lg font-medium mb-3 text-gray-700">آمار حافظه</h4>
-                            <button 
-                                onclick="getMemoryStats()"
-                                class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📊</span>
-                                <span>دریافت آمار</span>
-                            </button>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div id="memoryLoading" class="hidden">
-                            <div class="flex items-center justify-center py-8">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                                <span class="ml-2 text-blue-600">در حال پردازش...</span>
-                            </div>
-                        </div>
-
-                        <!-- Results Display -->
-                        <div id="memoryResult" class="hidden">
-                            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                                <h4 class="font-semibold mb-2">نتیجه:</h4>
-                                <div id="memoryContent" class="text-sm text-gray-700"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Sentiment Analysis Section -->
-                <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">تحلیل احساسات</h3>
-                    
-                    <!-- Sentiment Input -->
-                    <div class="flex gap-4 mb-3">
-                        <input 
-                            type="text" 
-                            id="sentimentInput" 
-                            placeholder="متن خود را برای تحلیل احساسات وارد کنید..."
-                            class="flex-1 p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            onkeypress="handleSentimentKeyPress(event)"
-                        >
-                        <button 
-                            id="sentimentBtn"
-                            onclick="analyzeSentiment()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل احساس</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Sentiment Result -->
-                    <div id="sentimentResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="sentimentContent" class="bg-white p-4 rounded-lg border-2 border-purple-200">
-                            <!-- Sentiment analysis result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Sentiment Loading -->
-                    <div id="sentimentLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل احساسات...</span>
-                    </div>
-                </div>
-                
-                <!-- Text Summarization Section -->
-                <div class="bg-gradient-to-r from-emerald-50 to-green-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-emerald-800">خلاصه‌سازی متن</h3>
-                    
-                    <!-- Summary Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="summaryInput" 
-                            placeholder="متن طولانی خود را برای خلاصه‌سازی وارد کنید..."
-                            class="w-full p-3 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-vertical min-h-[120px]"
-                            rows="5"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="summaryBtn"
-                            onclick="summarizeText()"
-                            class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>خلاصه کن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </button>
-                        <div class="text-sm text-gray-600 flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            حداقل 50 کاراکتر وارد کنید
-                        </div>
-                    </div>
-                    
-                    <!-- Summary Result -->
-                    <div id="summaryResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">خلاصه تولیدشده:</h4>
-                        <div id="summaryContent" class="bg-white p-4 rounded-lg border-2 border-emerald-200 max-h-96 overflow-y-auto">
-                            <!-- Summary result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Summary Loading -->
-                    <div id="summaryLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال خلاصه‌سازی...</span>
-                    </div>
-                </div>
-                
-                <!-- Long-term Memory Section -->
-                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">حافظه بلندمدت</h3>
-                    
-                    <!-- Memory Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="memoryInput" 
-                            placeholder="حافظه، یادداشت، یا یادآوری خود را وارد کنید..."
-                            class="w-full p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical min-h-[100px]"
-                            rows="4"
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Category Selection -->
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">دسته‌بندی:</label>
-                        <select 
-                            id="memoryCategory"
-                            class="w-full p-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        >
-                            <option value="یادداشت">یادداشت</option>
-                            <option value="هدف">هدف</option>
-                            <option value="تجربه">تجربه</option>
-                            <option value="درس">درس</option>
-                            <option value="یادآوری">یادآوری</option>
-                            <option value="احساس">احساس</option>
-                            <option value="ایده">ایده</option>
-                            <option value="برنامه">برنامه</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Tags Input -->
-                    <div class="mb-3">
-                        <input 
-                            type="text" 
-                            id="memoryTags"
-                            placeholder="تگ‌ها (با # جدا کنید، مثال: #کار #مهم)"
-                            class="w-full p-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="saveMemoryBtn"
-                            onclick="saveMemory()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>ذخیره حافظه</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="fetchMemoriesBtn"
-                            onclick="fetchMemories()"
-                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>نمایش حافظه‌ها</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Memory Result -->
-                    <div id="memoryResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه:</h4>
-                        <div id="memoryContent" class="bg-white p-4 rounded-lg border-2 border-purple-200 max-h-96 overflow-y-auto">
-                            <!-- Memory result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Memory Loading -->
-                    <div id="memoryLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال پردازش...</span>
-                    </div>
-                </div>
-                
-                <!-- Conceptual Memory Section -->
-                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-blue-800">تحلیل مفهومی</h3>
-                    
-                    <!-- Conceptual Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="conceptualInput" 
-                            placeholder="جمله یا مفهوم خود را برای تحلیل وارد کنید... (مثال: من عاشق یادگیری تدریجی هستم)"
-                            class="w-full p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="analyzeConceptBtn"
-                            onclick="analyzeConcept()"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل مفهوم</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="fetchConceptsBtn"
-                            onclick="fetchLatestConcepts()"
-                            class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>آخرین مفاهیم</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Conceptual Result -->
-                    <div id="conceptualResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="conceptualContent" class="bg-white p-4 rounded-lg border-2 border-blue-200 max-h-96 overflow-y-auto">
-                            <!-- Conceptual result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Conceptual Loading -->
-                    <div id="conceptualLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل مفهومی...</span>
-                    </div>
-                </div>
-                
-                <!-- Repetitive Learning Section -->
-                <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">تحلیل الگوهای تکراری</h3>
-                    
-                    <!-- Repetitive Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="repetitiveInput" 
-                            placeholder="متن خود را برای تحلیل الگوهای تکراری وارد کنید... (مثال: باید هر روز ورزش کنم)"
-                            class="w-full p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="observePatternBtn"
-                            onclick="observeRepetitivePattern()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>مشاهده الگو</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="fetchPatternsBtn"
-                            onclick="fetchFrequentPatterns()"
-                            class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>الگوهای تکراری</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Repetitive Result -->
-                    <div id="repetitiveResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="repetitiveContent" class="bg-white p-4 rounded-lg border-2 border-purple-200 max-h-96 overflow-y-auto">
-                            <!-- Repetitive result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Repetitive Loading -->
-                    <div id="repetitiveLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل الگوهای تکراری...</span>
-                    </div>
-                </div>
-                
-                <!-- Knowledge Graph Section -->
-                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-indigo-800">گراف دانش و تحلیل مفاهیم</h3>
-                    
-                    <!-- Knowledge Graph Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="knowledgeGraphInput" 
-                            placeholder="متن خود را برای استخراج مفاهیم و ساخت گراف دانش وارد کنید... (مثال: یادگیری ماشین شامل الگوریتم‌هایی است که از داده‌ها یاد می‌گیرند)"
-                            class="w-full p-3 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical min-h-[100px]"
-                            rows="4"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="buildGraphBtn"
-                            onclick="buildKnowledgeGraph()"
-                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>ساخت گراف</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="listGraphsBtn"
-                            onclick="listKnowledgeGraphs()"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>گراف‌های ذخیره شده</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Knowledge Graph Result -->
-                    <div id="knowledgeGraphResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="knowledgeGraphContent" class="bg-white p-4 rounded-lg border-2 border-indigo-200 max-h-96 overflow-y-auto">
-                            <!-- Knowledge graph result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Knowledge Graph Loading -->
-                    <div id="knowledgeGraphLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل مفاهیم و ساخت گراف...</span>
-                    </div>
-                </div>
-                
-                <!-- Auto Suggester Section -->
-                <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">پیشنهادات خودکار و راهنما</h3>
-                    
-                    <!-- Auto Suggester Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="suggesterInput" 
-                            placeholder="متن خود را وارد کنید تا پیشنهادات هوشمند دریافت کنید... (مثال: می‌خواهم ورزش کنم اما وقت ندارم)"
-                            class="w-full p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="getCompletionBtn"
-                            onclick="getCompletion()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>ادامه متن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="getHintsBtn"
-                            onclick="getHints()"
-                            class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>راهنماها</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="getSmartSuggestionsBtn"
-                            onclick="getSmartSuggestions()"
-                            class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>پیشنهادات هوشمند</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Auto Suggester Result -->
-                    <div id="suggesterResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">پیشنهادات:</h4>
-                        <div id="suggesterContent" class="bg-white p-4 rounded-lg border-2 border-purple-200 max-h-96 overflow-y-auto">
-                            <!-- Suggestions will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Auto Suggester Loading -->
-                    <div id="suggesterLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تولید پیشنهادات...</span>
-                    </div>
-                </div>
-                
-                <!-- Goal Inference Section -->
-                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-indigo-800">تشخیص هدف و نیت</h3>
-                    
-                    <!-- Goal Inference Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="goalInferenceInput" 
-                            placeholder="متن خود را وارد کنید تا هدف و نیت پشت آن تشخیص داده شود... (مثال: می‌خواهم شروع کنم اما نمی‌دانم از کجا)"
-                            class="w-full p-3 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="analyzeGoalBtn"
-                            onclick="analyzeGoal()"
-                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل هدف</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="clearGoalAnalysisBtn"
-                            onclick="clearGoalAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>پاک کردن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Goal Inference Result -->
-                    <div id="goalInferenceResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="goalInferenceContent" class="bg-white p-4 rounded-lg border-2 border-indigo-200 max-h-96 overflow-y-auto">
-                            <!-- Analysis results will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Goal Inference Loading -->
-                    <div id="goalInferenceLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل هدف و نیت...</span>
-                    </div>
-                </div>
-                
-                <!-- Emotion Regulation Section -->
-                <div class="bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-pink-800">تنظیم هیجان و احساسات</h3>
-                    
-                    <!-- Emotion Analysis Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="emotionInput" 
-                            placeholder="احساس یا هیجان خود را بیان کنید... (مثال: خیلی عصبانی هستم و نمی‌دانم چه کار کنم)"
-                            class="w-full p-3 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="analyzeEmotionBtn"
-                            onclick="analyzeEmotion()"
-                            class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل هیجان</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="clearEmotionAnalysisBtn"
-                            onclick="clearEmotionAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>پاک کردن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Emotion Analysis Result -->
-                    <div id="emotionResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="emotionContent" class="bg-white p-4 rounded-lg border-2 border-pink-200 max-h-96 overflow-y-auto">
-                            <!-- Emotion analysis results will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Emotion Analysis Loading -->
-                    <div id="emotionLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل هیجان و ارائه پیشنهاد...</span>
-                    </div>
-                </div>
-                
-                <!-- Decision Support Section -->
-                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-lg mb-4">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">پشتیبانی تصمیم‌گیری</h3>
-                    
-                    <!-- Decision Analysis Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="decisionInput" 
-                            placeholder="تصمیم یا انتخابی که در مورد آن تردید دارید را بیان کنید... (مثال: باید شغلم را عوض کنم یا نه؟)"
-                            class="w-full p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="analyzeDecisionBtn"
-                            onclick="analyzeDecision()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل تصمیم</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="clearDecisionAnalysisBtn"
-                            onclick="clearDecisionAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>پاک کردن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="listDecisionsBtn"
-                            onclick="listRecentDecisions()"
-                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تصمیمات قبلی</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Decision Analysis Result -->
-                    <div id="decisionResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل:</h4>
-                        <div id="decisionContent" class="bg-white p-4 rounded-lg border-2 border-purple-200 max-h-96 overflow-y-auto">
-                            <!-- Decision analysis results will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Decision Analysis Loading -->
-                    <div id="decisionLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل چندبعدی تصمیم...</span>
-                    </div>
-                </div>
-                
-                <!-- Future Tools Placeholder -->
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg opacity-50">
-                    <h3 class="text-lg font-medium mb-2 text-green-800">ابزارهای آینده</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="bg-white p-3 rounded-lg border border-green-200">
-                            <span class="text-green-600 font-medium">خلاصه‌سازی</span>
-                            <p class="text-sm text-gray-500 mt-1">خلاصه کردن متن‌های طولانی</p>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg border border-green-200">
-                            <span class="text-green-600 font-medium">ترجمه</span>
-                            <p class="text-sm text-gray-500 mt-1">ترجمه فارسی ⇄ انگلیسی</p>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg border border-green-200">
-                            <span class="text-green-600 font-medium">تحلیل متن</span>
-                            <p class="text-sm text-gray-500 mt-1">تحلیل عمق و پیچیدگی</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Memory Controls -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">مدیریت حافظه کوتاه‌مدت</h2>
-                
-                <div class="flex flex-wrap gap-4 mb-4">
-                    <button 
-                        onclick="showMemory()"
-                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                        <span>نمایش حافظه</span>
-                    </button>
-                    
-                    <button 
-                        onclick="clearMemory()"
-                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        <span>پاک کردن حافظه</span>
-                    </button>
-                </div>
-
-                <!-- Memory Display -->
-                <div id="memorySection" class="hidden">
-                    <h3 class="text-lg font-medium mb-2 text-gray-700">محتوای حافظه:</h3>
-                    <div id="memoryContent" class="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
-                        <!-- Memory content will be displayed here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Status -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">وضعیت سیستم</h2>
-                <div id="systemStatus" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-blue-800">Agent Status</h3>
-                        <p id="agentStatus" class="text-blue-600">در حال بررسی...</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-green-800">Memory Status</h3>
-                        <p id="memoryStatus" class="text-green-600">آماده</p>
-                    </div>
-                    <div class="bg-purple-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-purple-800">Connection</h3>
-                        <p id="connectionStatus" class="text-purple-600">متصل</p>
-                    </div>
-                </div>
-                
-                <!-- Self-Awareness Analysis Section -->
-                <div id="selfAwarenessSection" class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg mb-4 hidden">
-                    <h3 class="text-lg font-medium mb-3 text-purple-800">تحلیل خودآگاهی و وضعیت ذهنی</h3>
-                    
-                    <!-- Self-Awareness Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="awarenessInput" 
-                            placeholder="وضعیت ذهنی یا احساس خود را بیان کنید... (مثال: احساس خستگی دارم، نمی‌دونم چی کار می‌کنم، انگیزه‌ام از بین رفته)"
-                            class="w-full p-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical min-h-[80px]"
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-3">
-                        <button 
-                            id="analyzeAwarenessBtn"
-                            onclick="analyzeSelfAwareness()"
-                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>تحلیل خودآگاهی</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="clearAwarenessAnalysisBtn"
-                            onclick="clearAwarenessAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>پاک کردن</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            id="listAwarenessLogsBtn"
-                            onclick="listAwarenessLogs()"
-                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>گزارش‌ها</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Self-Awareness Result -->
-                    <div id="awarenessResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل خودآگاهی:</h4>
-                        <div id="awarenessContent" class="bg-white p-4 rounded-lg border-2 border-purple-200 max-h-96 overflow-y-auto">
-                            <!-- Self-awareness result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Self-Awareness Loading -->
-                    <div id="awarenessLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل خودآگاهی و وضعیت ذهنی...</span>
-                    </div>
-                </div>
-                
-                <!-- Interactive Security Check Section -->
-                <div id="securityCheckSection" class="bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-lg mb-4 hidden">
-                    <h3 class="text-lg font-medium mb-3 text-red-800">بررسی امنیت ذهنی و شناختی</h3>
-                    
-                    <!-- Security Check Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="securityInput" 
-                            placeholder="وضعیت ذهنی، احساسات، یا تصمیمی که قصد دارید اتخاذ کنید را بنویسید تا امنیت آن بررسی شود..."
-                            class="w-full p-3 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-vertical min-h-[120px]"
-                            rows="5"
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Security Check Actions -->
-                    <div class="flex gap-3 mb-4">
-                        <button 
-                            id="analyzeSecurityBtn"
-                            onclick="analyzeSecurityCheck()"
-                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>بررسی امنیت</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </button>
-                        
-                        <button 
-                            onclick="listSecurityChecks()"
-                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg transition-colors duration-200"
-                        >
-                            📋 گزارش‌های قبلی
-                        </button>
-                        
-                        <button 
-                            onclick="clearSecurityAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors duration-200"
-                        >
-                            🗑️ پاک کردن
-                        </button>
-                    </div>
-                    
-                    <!-- Security Check Result -->
-                    <div id="securityResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه بررسی امنیت:</h4>
-                        <div id="securityContent" class="bg-white p-4 rounded-lg border-2 border-red-200">
-                            <!-- Security analysis result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Security Check Loading -->
-                    <div id="securityLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال بررسی امنیت ذهنی و شناختی...</span>
-                    </div>
-                </div>
-                
-                <!-- Rewards Section -->
-                <div id="rewardsSection" class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg mb-4 hidden">
-                    <h3 class="text-lg font-medium mb-3 text-yellow-800">🏆 پاداش و تشویق</h3>
-                    
-                    <!-- Reward Analysis Input -->
-                    <div class="mb-3">
-                        <textarea 
-                            id="rewardInput" 
-                            placeholder="وضعیت فعلی، پیشرفت، یا دستاورد خود را بنویسید تا بررسی شود و در صورت پیشرفت مثبت، پاداش دریافت کنید..."
-                            class="w-full p-3 border border-yellow-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-vertical min-h-[120px]"
-                            rows="5"
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Reward Analysis Actions -->
-                    <div class="flex gap-3 mb-4">
-                        <button 
-                            id="analyzeRewardBtn"
-                            onclick="analyzeReward()"
-                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                        >
-                            <span>بررسی پیشرفت</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"></path>
-                            </svg>
-                        </button>
-                        
-                        <button 
-                            onclick="listRewardLogs()"
-                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg transition-colors duration-200"
-                        >
-                            📋 تاریخچه پاداش‌ها
-                        </button>
-                        
-                        <button 
-                            onclick="clearRewardAnalysis()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors duration-200"
-                        >
-                            🗑️ پاک کردن
-                        </button>
-                    </div>
-                    
-                    <!-- Reward Analysis Result -->
-                    <div id="rewardResult" class="hidden">
-                        <h4 class="text-md font-medium mb-2 text-gray-700">نتیجه تحلیل پاداش:</h4>
-                        <div id="rewardContent" class="bg-white p-4 rounded-lg border-2 border-yellow-200">
-                            <!-- Reward analysis result will be displayed here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Reward Analysis Loading -->
-                    <div id="rewardLoading" class="hidden flex items-center justify-center py-4">
-                        <div class="loading"></div>
-                        <span class="mr-2 text-gray-600">در حال تحلیل پیشرفت و تولید پاداش...</span>
-                    </div>
-                </div>
-                
-                <!-- Cognitive Distortion Section -->
-                <div id="cognitiveDistortionSection" class="hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🧠 Cognitive Distortion Detection (تشخیص تحریف‌های شناختی)</h3>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="mb-4">
-                            <textarea 
-                                id="distortionInput" 
-                                placeholder="افکار، احساسات، یا تصمیمات خود را برای تحلیل تحریف‌های شناختی بنویسید... (مثال: من همیشه اشتباه می‌کنم و کاملاً بی‌فایده‌ام)"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
-                                rows="4"
-                                dir="rtl"
-                            ></textarea>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button 
-                                id="analyzeDistortionBtn" 
-                                onclick="analyzeDistortion()"
-                                class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🔍</span>
-                                <span>تحلیل تحریف</span>
-                            </button>
-                            <button 
-                                onclick="listDistortionLogs()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📋</span>
-                                <span>تاریخچه</span>
-                            </button>
-                            <button 
-                                onclick="clearDistortionAnalysis()"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🗑️</span>
-                                <span>پاک کردن</span>
-                            </button>
-                            <button 
-                                onclick="showDistortionTypes()"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📚</span>
-                                <span>انواع تحریف</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Distortion Types Guide -->
-                        <div id="distortionTypesGuide" class="hidden mb-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-                            <h4 class="font-semibold mb-3 text-indigo-800">انواع تحریف‌های شناختی:</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">تفکر همه یا هیچ:</strong>
-                                    <p class="text-gray-600 mt-1">دیدن موقعیت‌ها در دو قطب افراطی</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">تعمیم افراطی:</strong>
-                                    <p class="text-gray-600 mt-1">نتیجه‌گیری کلی از یک واقعه</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">فاجعه‌سازی:</strong>
-                                    <p class="text-gray-600 mt-1">بزرگ‌نمایی منفی و تصور بدترین حالت</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">برچسب‌زدن:</strong>
-                                    <p class="text-gray-600 mt-1">نام‌گذاری منفی به جای توصیف رفتار</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">شخصی‌سازی:</strong>
-                                    <p class="text-gray-600 mt-1">مسئول دانستن خود برای همه چیز</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">ذهن‌خوانی:</strong>
-                                    <p class="text-gray-600 mt-1">فرض کردن که می‌دانید دیگران چه فکر می‌کنند</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">استدلال عاطفی:</strong>
-                                    <p class="text-gray-600 mt-1">باور به این که احساسات حقیقت را منعکس می‌کنند</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">فیلتر کردن:</strong>
-                                    <p class="text-gray-600 mt-1">تمرکز منحصر بر جنبه‌های منفی</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">سرزنش:</strong>
-                                    <p class="text-gray-600 mt-1">مسئول دانستن دیگران برای مشکلات</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">پیشگویی:</strong>
-                                    <p class="text-gray-600 mt-1">پیش‌بینی منفی آینده بدون شواهد</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Distortion Result -->
-                        <div id="distortionResult" class="hidden">
-                            <h4 class="text-lg font-semibold mb-3 text-gray-800">نتیجه تحلیل تحریف‌های شناختی:</h4>
-                            <div id="distortionContent" class="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-lg border-2 border-pink-200 max-h-96 overflow-y-auto">
-                                <!-- Distortion result will be displayed here -->
-                            </div>
-                        </div>
-                        
-                        <!-- Distortion Loading -->
-                        <div id="distortionLoading" class="hidden flex items-center justify-center py-4">
-                            <div class="loading"></div>
-                            <span class="mr-2 text-gray-600">در حال تحلیل تحریف‌های شناختی...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Ethical Reasoning Section -->
-                <div id="ethicalReasoningSection" class="hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">🧭 Ethical Reasoning Analysis (تحلیل استدلال اخلاقی)</h3>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="mb-4">
-                            <textarea 
-                                id="ethicalInput" 
-                                placeholder="تصمیم، بیانیه، یا موقعیت خود را برای تحلیل اخلاقی بنویسید..."
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                                rows="4"
-                                dir="rtl"
-                            ></textarea>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button 
-                                id="analyzeEthicalBtn" 
-                                onclick="analyzeEthical()"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🔍</span>
-                                <span>تحلیل اخلاقی</span>
-                            </button>
-                            <button 
-                                onclick="listEthicalLogs()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>📋</span>
-                                <span>تاریخچه</span>
-                            </button>
-                            <button 
-                                onclick="clearEthicalAnalysis()"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                            >
-                                <span>🗑️</span>
-                                <span>پاک کردن</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Ethical Framework Reference -->
-                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
-                            <h4 class="font-semibold text-indigo-800 mb-2">چارچوب‌های اخلاقی مرجع:</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">فایده‌گرایی (Utilitarianism):</strong>
-                                    <p class="text-gray-600 mt-1">بیشترین خیر برای بیشترین تعداد افراد</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">تکلیف‌گرایی (Deontology):</strong>
-                                    <p class="text-gray-600 mt-1">اصول اخلاقی و وظایف قطعی</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">اخلاق فضیلت (Virtue Ethics):</strong>
-                                    <p class="text-gray-600 mt-1">تمرکز بر شخصیت و فضایل اخلاقی</p>
-                                </div>
-                                <div class="bg-white p-3 rounded border border-indigo-100">
-                                    <strong class="text-indigo-700">اخلاق مراقبت (Care Ethics):</strong>
-                                    <p class="text-gray-600 mt-1">اهمیت روابط و مراقبت از دیگران</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Ethical Result -->
-                        <div id="ethicalResult" class="hidden">
-                            <h4 class="text-lg font-semibold mb-3 text-gray-800">نتیجه تحلیل اخلاقی:</h4>
-                            <div id="ethicalContent" class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg border-2 border-indigo-200 max-h-96 overflow-y-auto">
-                                <!-- Ethical result will be displayed here -->
-                            </div>
-                        </div>
-                        
-                        <!-- Ethical Loading -->
-                        <div id="ethicalLoading" class="hidden flex items-center justify-center py-4">
-                            <div class="loading"></div>
-                            <span class="mr-2 text-gray-600">در حال تحلیل اخلاقی...</span>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2025 AriaRobot - سیستم هوشمند پردازش پیام</p>
-            <p class="text-gray-400 mt-1">FastAPI + AI Agents + Short-term Memory</p>
-        </div>
-    </footer>
-
-    <script src="/static/script.js"></script>
-</body>
-</html>

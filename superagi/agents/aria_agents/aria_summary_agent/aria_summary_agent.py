@@ -39,7 +39,7 @@ class AriaSummaryAgent(BaseAriaAgent):
             Dict: Task execution result with summary and analysis
         """
         try:
-            self.log(f"Executing summary task: {task}")
+            logger.info(f"Executing summary task: {task}")
             
             if not context:
                 context = {}
@@ -73,7 +73,7 @@ class AriaSummaryAgent(BaseAriaAgent):
                 "agent": self.get_agent_type()
             }
             
-            self.remember(f"Completed summary task: {task}")
+            logger.info(f"Completed summary task: {task}")
             return execution_result
             
         except Exception as e:
@@ -84,7 +84,7 @@ class AriaSummaryAgent(BaseAriaAgent):
                 "timestamp": datetime.utcnow().isoformat(),
                 "agent": self.get_agent_type()
             }
-            self.log(f"Error executing summary task: {str(e)}", "error")
+            logger.error(f"Error executing summary task: {str(e)}")
             return error_result
 
     def _summarize_text(self, content: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
