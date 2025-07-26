@@ -172,3 +172,7 @@ openai
 tenacity
 reportlab
 beautifulsoup4
+lxml_html_clean
+newspaper3k
+lxml_html_clean
+newspaper3k
