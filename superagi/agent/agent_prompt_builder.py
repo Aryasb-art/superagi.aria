@@ -1,7 +1,6 @@
 import json
 import re
-
-from pydantic.types import List
+from typing import List
 
 from superagi.helper.token_counter import TokenCounter
 from superagi.tools.base_tool import BaseTool
