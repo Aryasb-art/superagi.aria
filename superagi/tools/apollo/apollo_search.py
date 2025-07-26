@@ -44,8 +44,8 @@ class ApolloSearchTool(BaseTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "ApolloSearch"
-    description = (
+    name: str = "ApolloSearch"
+    description: str = (
         "A tool for performing a Apollo search and extracting people data."
         "Input should include API key, organization domains, page number, and person titles."
     )
