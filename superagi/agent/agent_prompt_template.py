@@ -1,6 +1,6 @@
 import re
 
-from pydantic.types import List
+from typing import List
 
 from superagi.helper.prompt_reader import PromptReader
 

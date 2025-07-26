@@ -3,7 +3,7 @@
 PINECONE_API_KEY: 
 PINECONE_ENVIRONMENT: 
 
-OPENAI_API_KEY: ${OPENAI_API_KEY}
+OPENAI_API_KEY: YOUR_OPENAI_API_KEY_HERE
 PALM_API_KEY: 
 REPLICATE_API_TOKEN: 
 HUGGING_API_TOKEN: 
@@ -21,12 +21,12 @@ MAX_TOOL_TOKEN_LIMIT: 800
 MAX_MODEL_TOKEN_LIMIT: 4032 # set to 2048 for llama
 
 #DATABASE INFO
-# redis details
-DB_NAME: superagi_rb2d
-DB_HOST: dpg-d1jd9mqli9vc739oe120-a
-DB_USERNAME: superagi_user
-DB_PASSWORD: KlbTE6LOdFQJOhs9SJ0yUAOZxpdRZ82F
-DB_URL: ${DB_URL}
+# redis details (Using SQLite for Replit)
+DB_NAME: superagi_local.db
+DB_HOST: localhost
+DB_USERNAME: 
+DB_PASSWORD: 
+DB_URL: sqlite:///superagi_local.db
 REDIS_URL: "localhost:6379"
 
 #STORAGE TYPE ("FILE" or "S3")
