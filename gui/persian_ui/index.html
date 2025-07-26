@@ -296,7 +296,7 @@
         // Test connection to backend
         async function testConnection() {
             try {
-                const response = await fetch('/health');
+                const response = await fetch('/ping');
                 if (response.ok) {
                     console.log('✅ اتصال به سرور برقرار است');
                     statusIndicator.textContent = '✅ آنلاین';
@@ -305,6 +305,11 @@
                     console.log('⚠️ مشکل در اتصال به سرور');
                     statusIndicator.textContent = '⚠️ مشکل در اتصال';
                     statusIndicator.className = 'status-indicator status-offline';
+                }
+            } catch (error) {
+                console.log('❌ عدم اتصال به سرور');
+                statusIndicator.textContent = '❌ آفلاین';
+                statusIndicator.className = 'status-indicator status-offline';sIndicator.className = 'status-indicator status-offline';
                 }
             } catch (error) {
                 console.log('❌ خطا در اتصال به سرور:', error);
