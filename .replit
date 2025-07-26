@@ -3,7 +3,7 @@ run = "uvicorn main:app --host 0.0.0.0 --port 8000"
 
 [nix]
 channel = "stable-24_05"
-packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
+packages = ["cacert", "cargo", "freetype", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
 
 [deployment]
 run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]

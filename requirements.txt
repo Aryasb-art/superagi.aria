@@ -170,3 +170,4 @@ passlib
 boto3
 openai
 tenacity
+reportlab
