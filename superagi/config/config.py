@@ -5,6 +5,9 @@ import yaml
 try:
     from pydantic_settings import BaseSettings
 except ImportError:
+    try:
+    from pydantic_settings import BaseSettings
+except ImportError:
     from pydantic import BaseSettings
 
 CONFIG_FILE = "config.yaml"
