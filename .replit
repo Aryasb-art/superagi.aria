@@ -10,7 +10,7 @@ run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]
 build = ["sh", "-c", "cd gui && npm install && npm run build"]
 
 [workflows]
-runButton = "Persian UI Server"
+runButton = "Persian UI Server Fixed"
 
 [[workflows.workflow]]
 name = "Aria MVP"
@@ -38,3 +38,16 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python aria_mvp_runner.py --mode interactive"
+
+[[workflows.workflow]]
+name = "Persian UI Server Fixed"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"import pydantic; print(f'Pydantic version: {pydantic.VERSION}')\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
