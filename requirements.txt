@@ -200,3 +200,4 @@ slack-sdk
 slack-sdk
 fastapi-jwt-auth
 fastapi-jwt-auth
+fastapi-jwt-auth

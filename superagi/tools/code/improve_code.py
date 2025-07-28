@@ -1,3 +1,4 @@
+# Applying the fix to the name field type annotation in ImproveCodeTool.
 import re
 from typing import Type, Optional, List
 
@@ -31,10 +32,8 @@ class ImproveCodeTool(BaseTool):
         resource_manager: Manages the file resources.
     """
     llm: Optional[BaseLlm] = None
-    agent_id: int = None
-    agent_execution_id: int = None
-    name = "ImproveCodeTool"
-    description = (
+    name: str = "ImproveCodeTool"
+    description: str = (
         "This tool improves the generated code."
     )
     args_schema: Type[ImproveCodeSchema] = ImproveCodeSchema
@@ -75,7 +74,7 @@ class ImproveCodeTool(BaseTool):
 
                 # Use LLM to generate improved code
                 result = self.llm.chat_completion([{'role': 'system', 'content': prompt}])
-                
+
                 if result is not None and 'error' in result and result['message'] is not None:
                    ErrorHandler.handle_openai_errors(self.toolkit_config.session, self.agent_id, self.agent_execution_id, result['message'])
 
