@@ -26,7 +26,7 @@ class EditIssueTool(JiraTool):
         args_schema : The args schema.
     """
     name: str = "EditJiraIssue"
-    description = "Edit a Jira issue."
+    description: str = "Edit a Jira issue."
     args_schema: Type[EditIssueSchema] = EditIssueSchema
 
     def _execute(self, key: str, fields: dict):

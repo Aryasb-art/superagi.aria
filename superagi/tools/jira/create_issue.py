@@ -22,7 +22,7 @@ class CreateIssueTool(JiraTool):
         args_schema : The args schema.
     """
     name: str = "CreateJiraIssue"
-    description = "Create a new Jira issue."
+    description: str = "Create a new Jira issue."
     args_schema: Type[CreateIssueSchema] = CreateIssueSchema
 
     def _execute(self, fields: dict):
