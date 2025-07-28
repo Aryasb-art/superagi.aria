@@ -80,8 +80,7 @@ class BaseTool(BaseModel):
     permission_required: bool = True
     toolkit_config: BaseToolkitConfiguration = BaseToolkitConfiguration()
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = {"arbitrary_types_allowed": True}
 
     @property
     def args(self):
@@ -323,8 +322,7 @@ class BaseTool(BaseModel):
     permission_required: bool = True
     toolkit_config: BaseToolkitConfiguration = BaseToolkitConfiguration()
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = {"arbitrary_types_allowed": True}
 
     @property
     def args(self):

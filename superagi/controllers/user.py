@@ -1,3 +1,4 @@
+# Updating Pydantic model configs for v2 compatibility.
 from datetime import datetime
 from typing import Optional
 
@@ -26,8 +27,7 @@ class UserBase(BaseModel):
     email: str
     password: str
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class UserOut(UserBase):
@@ -36,15 +36,13 @@ class UserOut(UserBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class UserIn(UserBase):
     organisation_id: Optional[int]
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 # CRUD Operations
@@ -64,28 +62,28 @@ def create_user(user: UserIn, Authorize: AuthJWT = Depends(check_auth)):
         HTTPException (status_code=422): If required fields are missing or incorrectly formatted.
     """
     logger.info("Received user data: %s", user)
-    
+
     # Validate incoming request data
     if not user.name or not user.email or not user.password:
         logger.error("Missing required fields: name, email, or password")
         raise HTTPException(status_code=422, detail="Missing required fields: name, email, or password")
-    
+
     db_user = db.session.query(User).filter(User.email == user.email).first()
     if db_user:
         return db_user
-    
+
     db_user = User(name=user.name, email=user.email, password=user.password, organisation_id=user.organisation_id)
     db.session.add(db_user)
     db.session.commit()
     db.session.flush()
-    
+
     organisation = Organisation.find_or_create_organisation(db.session, db_user)
     Project.find_or_create_default_project(db.session, organisation.id)
     logger.info("User created: %s", db_user)
-    
+
     # Adding local LLM configuration
     ModelsConfig.add_llm_config(db.session, organisation.id)
-    
+
     return db_user
 
 
