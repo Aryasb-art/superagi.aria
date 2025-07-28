@@ -4,7 +4,7 @@ from inspect import signature
 from typing import List
 from typing import Optional, Type, Callable, Any, Union, Dict, Tuple
 import yaml
-from pydantic import BaseModel, create_model, validate_arguments, Extra
+from pydantic import BaseModel, create_model, ConfigDict
 from superagi.models.tool_config import ToolConfig
 from sqlalchemy import Column, Integer, String, Boolean
 from superagi.types.key_type import ToolConfigKeyType
@@ -13,10 +13,10 @@ from superagi.types.key_type import ToolConfigKeyType
 from superagi.config.config import get_config
 
 
-class SchemaSettings:
-    """Configuration for the pydantic model."""
-    extra = "forbid"
-    arbitrary_types_allowed = True
+model_config = ConfigDict(
+    extra="forbid",
+    arbitrary_types_allowed=True
+)
 
 
 def extract_valid_parameters(
@@ -49,8 +49,9 @@ def create_function_schema(
         function: Callable,
 ) -> Type[BaseModel]:
     """Create a pydantic schema from a function's signature."""
-    validated = validate_arguments(function, config=SchemaSettings)  # type: ignore
-    inferred_type = validated.model  # type: ignore
+    # validated = validate_arguments(function, config=SchemaSettings)  # type: ignore #validate_arguments is removed in pydantic v2
+    validated = function # type: ignore
+    inferred_type = validated.__annotations__["return"]  # type: ignore
     if "run_manager" in inferred_type.model_fields:
         del inferred_type.model_fields["run_manager"]
     valid_parameters = extract_valid_parameters(inferred_type, function)
@@ -85,11 +86,11 @@ class BaseTool(BaseModel):
     @property
     def args(self):
         if self.args_schema is not None:
-            return self.args_schema.schema()["properties"]
+            return self.args_schema.model_json_schema()["properties"]
         else:
             name = self.name
             args_schema = create_function_schema(f"{name}Schema", self.execute)
-            return args_schema.schema()["properties"]
+            return args_schema.model_json_schema()["properties"]
 
     @abstractmethod
     def _execute(self, *args: Any, **kwargs: Any):
@@ -107,13 +108,15 @@ class BaseTool(BaseModel):
         input_args = self.args_schema
         if isinstance(tool_input, str):
             if input_args is not None:
-                key_ = next(iter(input_args.__fields__.keys()))
-                input_args.validate({key_: tool_input})
+                key_ = next(iter(input_args.model_fields.keys()))
+                # input_args.validate({key_: tool_input}) #validate is removed in pydantic v2
+                input_args.model_validate({key_: tool_input})
             return tool_input
         else:
             if input_args is not None:
-                result = input_args.parse_obj(tool_input)
-                return {k: v for k, v in result.dict().items() if k in tool_input}
+                # result = input_args.parse_obj(tool_input) #parse_obj is removed in pydantic v2
+                result = input_args.model_validate(tool_input)
+                return {k: v for k, v in result.model_dump().items() if k in tool_input}
         return tool_input
 
     def _to_args_and_kwargs(self, tool_input: Union[str, Dict]) -> Tuple[Tuple, Dict]:
@@ -161,11 +164,11 @@ class FunctionalTool(BaseTool):
     @property
     def args(self):
         if self.args_schema is not None:
-            return self.args_schema.schema()["properties"]
+            return self.args_schema.model_json_schema()["properties"]
         else:
             name = self.name
             args_schema = create_function_schema(f"{name}Schema", self.execute)
-            return args_schema.schema()["properties"]
+            return args_schema.model_json_schema()["properties"]
 
     def _execute(self, *args: Any, **kwargs: Any):
         return self.func(*args, kwargs)
@@ -241,12 +244,13 @@ class BaseToolkit(BaseModel):
     def get_env_keys(self) -> List[str]:
         # Add file related config keys here
         pass
+from abc import abstractmethod
 from functools import wraps
 from inspect import signature
 from typing import List
 from typing import Optional, Type, Callable, Any, Union, Dict, Tuple
 import yaml
-from pydantic import BaseModel, create_model, validate_arguments, Extra
+from pydantic import BaseModel, create_model, ConfigDict
 from superagi.models.tool_config import ToolConfig
 from sqlalchemy import Column, Integer, String, Boolean
 from superagi.types.key_type import ToolConfigKeyType
@@ -255,10 +259,10 @@ from superagi.types.key_type import ToolConfigKeyType
 from superagi.config.config import get_config
 
 
-class SchemaSettings:
-    """Configuration for the pydantic model."""
-    extra = "forbid"
-    arbitrary_types_allowed = True
+model_config = ConfigDict(
+    extra="forbid",
+    arbitrary_types_allowed=True
+)
 
 
 def extract_valid_parameters(
@@ -291,8 +295,9 @@ def create_function_schema(
         function: Callable,
 ) -> Type[BaseModel]:
     """Create a pydantic schema from a function's signature."""
-    validated = validate_arguments(function, config=SchemaSettings)  # type: ignore
-    inferred_type = validated.model  # type: ignore
+    # validated = validate_arguments(function, config=SchemaSettings)  # type: ignore #validate_arguments is removed in pydantic v2
+    validated = function # type: ignore
+    inferred_type = validated.__annotations__["return"]  # type: ignore
     if "run_manager" in inferred_type.model_fields:
         del inferred_type.model_fields["run_manager"]
     valid_parameters = extract_valid_parameters(inferred_type, function)
@@ -327,11 +332,11 @@ class BaseTool(BaseModel):
     @property
     def args(self):
         if self.args_schema is not None:
-            return self.args_schema.schema()["properties"]
+            return self.args_schema.model_json_schema()["properties"]
         else:
             name = self.name
             args_schema = create_function_schema(f"{name}Schema", self.execute)
-            return args_schema.schema()["properties"]
+            return args_schema.model_json_schema()["properties"]
 
     @abstractmethod
     def _execute(self, *args: Any, **kwargs: Any):
@@ -349,13 +354,15 @@ class BaseTool(BaseModel):
         input_args = self.args_schema
         if isinstance(tool_input, str):
             if input_args is not None:
-                key_ = next(iter(input_args.__fields__.keys()))
-                input_args.validate({key_: tool_input})
+                key_ = next(iter(input_args.model_fields.keys()))
+                # input_args.validate({key_: tool_input}) #validate is removed in pydantic v2
+                input_args.model_validate({key_: tool_input})
             return tool_input
         else:
             if input_args is not None:
-                result = input_args.parse_obj(tool_input)
-                return {k: v for k, v in result.dict().items() if k in tool_input}
+                # result = input_args.parse_obj(tool_input) #parse_obj is removed in pydantic v2
+                result = input_args.model_validate(tool_input)
+                return {k: v for k, v in result.model_dump().items() if k in tool_input}
         return tool_input
 
     def _to_args_and_kwargs(self, tool_input: Union[str, Dict]) -> Tuple[Tuple, Dict]:
@@ -403,11 +410,11 @@ class FunctionalTool(BaseTool):
     @property
     def args(self):
         if self.args_schema is not None:
-            return self.args_schema.schema()["properties"]
+            return self.args_schema.model_json_schema()["properties"]
         else:
             name = self.name
             args_schema = create_function_schema(f"{name}Schema", self.execute)
-            return args_schema.schema()["properties"]
+            return args_schema.model_json_schema()["properties"]
 
     def _execute(self, *args: Any, **kwargs: Any):
         return self.func(*args, kwargs)

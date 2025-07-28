@@ -43,8 +43,7 @@ class DuckDuckGoSearchTool(BaseTool):
     )
     args_schema: Type[DuckDuckGoSearchSchema] = DuckDuckGoSearchSchema
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = {"arbitrary_types_allowed": True}
 
     def _execute(self, query: str) -> tuple:
 
