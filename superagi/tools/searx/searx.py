@@ -24,7 +24,7 @@ class SearxSearchTool(BaseTool):
         args_schema : The args schema.
     """
     llm: Optional[BaseLlm] = None
-    name = "SearxSearch"
+    name: str = "SearxSearch"
     agent_id:int =None
     agent_execution_id:int =None
     description = (
@@ -72,7 +72,7 @@ class SearxSearchTool(BaseTool):
 
         messages = [{"role": "system", "content": summarize_prompt}]
         result = self.llm.chat_completion(messages, max_tokens=self.max_token_limit)
-        
+
         if 'error' in result and result['message'] is not None:
             ErrorHandler.handle_openai_errors(self.toolkit_config.session, self.agent_id, self.agent_execution_id, result['message'])
         return result["content"]
