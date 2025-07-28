@@ -25,7 +25,7 @@ class EditIssueTool(JiraTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "EditJiraIssue"
+    name: str = "EditJiraIssue"
     description = "Edit a Jira issue."
     args_schema: Type[EditIssueSchema] = EditIssueSchema
 

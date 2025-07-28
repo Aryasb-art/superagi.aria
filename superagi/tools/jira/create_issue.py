@@ -21,7 +21,7 @@ class CreateIssueTool(JiraTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "CreateJiraIssue"
+    name: str = "CreateJiraIssue"
     description = "Create a new Jira issue."
     args_schema: Type[CreateIssueSchema] = CreateIssueSchema
 

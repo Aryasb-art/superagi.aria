@@ -23,7 +23,7 @@ class SearchJiraTool(JiraTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "SearchJiraIssues"
+    name: str = "SearchJiraIssues"
     description = "This tool is a wrapper around atlassian-python-api's Jira jql API, useful when you need to search for Jira issues."
     args_schema: Type[SearchIssueSchema] = SearchIssueSchema
 
