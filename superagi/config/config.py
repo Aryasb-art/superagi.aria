@@ -6,9 +6,9 @@ try:
     from pydantic_settings import BaseSettings
 except ImportError:
     try:
-    from pydantic_settings import BaseSettings
-except ImportError:
-    from pydantic import BaseSettings
+        from pydantic_settings import BaseSettings
+    except ImportError:
+        from pydantic import BaseSettings
 
 CONFIG_FILE = "config.yaml"
 ROOT_DIR = os.path.dirname(Path(__file__))
