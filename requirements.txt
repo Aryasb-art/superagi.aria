@@ -192,4 +192,4 @@ fastapi-jwt-auth
 fastapi-jwt-auth
 fastapi==0.95.2
 pydantic==1.10.12
-typing-extensions==4.5.0
+typing-extensions==4.7.1
