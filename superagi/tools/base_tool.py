@@ -1,4 +1,3 @@
-# Fix: Modified BaseTool to include type annotations for name and description to be compatible with Pydantic v2.
 from abc import abstractmethod
 from functools import wraps
 from inspect import signature
@@ -16,7 +15,7 @@ from superagi.config.config import get_config
 
 class SchemaSettings:
     """Configuration for the pydantic model."""
-    extra = Extra.forbid
+    extra = "forbid"
     arbitrary_types_allowed = True
 
 
@@ -25,7 +24,7 @@ def extract_valid_parameters(
         function: Callable,
 ) -> dict:
     """Get the arguments from a function's signature."""
-    schema = inferred_type.schema()["properties"]
+    schema = inferred_type.model_json_schema()["properties"]
     valid_params = signature(function).parameters
     return {param: schema[param] for param in valid_params if param != "run_manager"}
 
@@ -36,11 +35,11 @@ def _construct_model_subset(
     """Create a pydantic model with only a subset of model's fields."""
     fields = {
         field: (
-            original_model.__fields__[field].type_,
-            original_model.__fields__[field].default,
+            original_model.model_fields[field].annotation,
+            original_model.model_fields[field].default,
         )
         for field in required_fields
-        if field in original_model.__fields__
+        if field in original_model.model_fields
     }
     return create_model(model_name, **fields)  # type: ignore
 
@@ -52,8 +51,8 @@ def create_function_schema(
     """Create a pydantic schema from a function's signature."""
     validated = validate_arguments(function, config=SchemaSettings)  # type: ignore
     inferred_type = validated.model  # type: ignore
-    if "run_manager" in inferred_type.__fields__:
-        del inferred_type.__fields__["run_manager"]
+    if "run_manager" in inferred_type.model_fields:
+        del inferred_type.model_fields["run_manager"]
     valid_parameters = extract_valid_parameters(inferred_type, function)
     return _construct_model_subset(
         f"{schema_name}Schema", inferred_type, list(valid_parameters)
@@ -259,7 +258,7 @@ from superagi.config.config import get_config
 
 class SchemaSettings:
     """Configuration for the pydantic model."""
-    extra = Extra.forbid
+    extra = "forbid"
     arbitrary_types_allowed = True
 
 
@@ -268,7 +267,7 @@ def extract_valid_parameters(
         function: Callable,
 ) -> dict:
     """Get the arguments from a function's signature."""
-    schema = inferred_type.schema()["properties"]
+    schema = inferred_type.model_json_schema()["properties"]
     valid_params = signature(function).parameters
     return {param: schema[param] for param in valid_params if param != "run_manager"}
 
@@ -279,11 +278,11 @@ def _construct_model_subset(
     """Create a pydantic model with only a subset of model's fields."""
     fields = {
         field: (
-            original_model.__fields__[field].type_,
-            original_model.__fields__[field].default,
+            original_model.model_fields[field].annotation,
+            original_model.model_fields[field].default,
         )
         for field in required_fields
-        if field in original_model.__fields__
+        if field in original_model.model_fields
     }
     return create_model(model_name, **fields)  # type: ignore
 
@@ -295,8 +294,8 @@ def create_function_schema(
     """Create a pydantic schema from a function's signature."""
     validated = validate_arguments(function, config=SchemaSettings)  # type: ignore
     inferred_type = validated.model  # type: ignore
-    if "run_manager" in inferred_type.__fields__:
-        del inferred_type.__fields__["run_manager"]
+    if "run_manager" in inferred_type.model_fields:
+        del inferred_type.model_fields["run_manager"]
     valid_parameters = extract_valid_parameters(inferred_type, function)
     return _construct_model_subset(
         f"{schema_name}Schema", inferred_type, list(valid_parameters)

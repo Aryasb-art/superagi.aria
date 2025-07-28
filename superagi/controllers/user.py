@@ -27,7 +27,7 @@ class UserBase(BaseModel):
     password: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserOut(UserBase):
@@ -37,7 +37,7 @@ class UserOut(UserBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserIn(UserBase):
