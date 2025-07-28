@@ -198,3 +198,5 @@ fastapi==0.100.1
 pydantic==1.10.8
 slack-sdk
 slack-sdk
+fastapi-jwt-auth
+fastapi-jwt-auth
