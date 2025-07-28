@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from pydantic import BaseModel
-from pydantic.v1 import BaseModel as BaseModelV1
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
