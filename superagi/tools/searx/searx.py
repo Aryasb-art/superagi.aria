@@ -27,7 +27,7 @@ class SearxSearchTool(BaseTool):
     name: str = "SearxSearch"
     agent_id:int =None
     agent_execution_id:int =None
-    description = (
+    description: str = (
         "A tool for performing a Searx search and extracting snippets and webpages."
         "Input should be a search query."
     )
