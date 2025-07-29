@@ -1,13 +1,12 @@
 modules = ["python-3.12", "nodejs-20", "web", "bash"]
-run = "uvicorn main:app --host 0.0.0.0 --port 8000"
+run = "uvicorn main:app --host 0.0.0.0 --port 5000"
 
 [nix]
 channel = "stable-24_05"
 packages = ["cacert", "cargo", "freetype", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib", "lsof"]
 
 [deployment]
-run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]
-build = ["sh", "-c", "cd gui && npm install && npm run build"]
+run = "uvicorn main:app --host 0.0.0.0 --port 5000"
 
 [workflows]
 runButton = "Persian UI Server Fixed"

@@ -36,6 +36,11 @@ async def persian_ui():
     from fastapi.responses import RedirectResponse
     return RedirectResponse(url="/persian/")
 
+@app.get("/persian")
+async def persian_ui_direct():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/persian/")
+
 @app.get("/health")
 async def health():
     return {
