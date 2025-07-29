@@ -1,6 +1,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import pydantic
 
@@ -17,6 +18,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount Persian UI static files
+app.mount("/persian", StaticFiles(directory="gui/persian_ui", html=True), name="persian_ui")
 
 @app.get("/")
 async def root():
