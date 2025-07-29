@@ -102,11 +102,14 @@ class logger: # Placeholder for the actual logger
 @app.post("/aria/chat")
 async def aria_chat(request: AriaChatRequest):
     """
-    Enhanced Aria Robot chat endpoint with Master Agent coordination
+    Enhanced Aria Robot chat endpoint with Agent Pool and Master Agent coordination
     """
     try:
-        # Create Master Agent with enhanced capabilities
-        master_agent = AriaMasterAgent(None, "master-001")
+        from superagi.agents.aria_agents.aria_agent_pool import AriaAgentPool
+        
+        # Initialize global agent pool if not exists
+        if not hasattr(app.state, "agent_pool"):
+            app.state.agent_pool = AriaAgentPool(max_agents_per_type=5)
 
         # Enhanced context for better decision making
         enhanced_context = {
@@ -117,13 +120,32 @@ async def aria_chat(request: AriaChatRequest):
             "preferred_language": "persian"
         }
 
-        # Process message through Master Agent
+        # Submit task to agent pool with priority
+        priority = request.context.get("priority", 1)
+        task_id = app.state.agent_pool.submit_task(
+            message=request.message,
+            context=enhanced_context,
+            priority=priority
+        )
+
+        # For immediate response, we'll still use Master Agent
+        # but in production, you'd wait for pool result
+        master_agent = AriaMasterAgent(None, "master-001")
         response = master_agent.respond(request.message, enhanced_context)
+
+        # Get pool metrics for monitoring
+        pool_status = app.state.agent_pool.get_pool_status()
 
         return {
             "success": True,
             "response": response.get("response", "No response generated"),
             "agent": "AriaMasterAgent",
+            "task_id": task_id,
+            "pool_metrics": {
+                "total_agents": pool_status.get("total_agents", 0),
+                "active_tasks": pool_status.get("active_tasks", 0),
+                "queue_size": pool_status.get("queue_size", 0)
+            },
             "metadata": {
                 **response.get("metadata", {}),
                 "task_analysis": response.get("task_analysis", {}),
@@ -174,16 +196,44 @@ async def aria_system_status():
         healthy_agents = len([a for a in agent_status.values() if a["status"] == "healthy"])
         total_agents = len(agent_status)
 
+        # Get agent pool status if available
+        pool_status = {}
+        if hasattr(app.state, "agent_pool"):
+            pool_status = app.state.agent_pool.get_pool_status()
+
         return {
             "system_status": "healthy" if healthy_agents == total_agents else "degraded",
             "healthy_agents": f"{healthy_agents}/{total_agents}",
             "agents": agent_status,
+            "pool_status": pool_status,
             "timestamp": datetime.now().isoformat()
         }
 
     except Exception as e:
         return {
             "system_status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.get("/aria/pool/metrics")
+async def get_pool_metrics():
+    """
+    Detailed agent pool metrics
+    """
+    try:
+        if not hasattr(app.state, "agent_pool"):
+            return {"error": "Agent pool not initialized"}
+        
+        metrics = app.state.agent_pool.get_pool_status()
+        return {
+            "success": True,
+            "metrics": metrics,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {
+            "success": False,
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
