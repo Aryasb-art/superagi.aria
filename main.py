@@ -1,4 +1,3 @@
-
 import os
 import signal
 import sys
@@ -7,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import pydantic
+from datetime import datetime
+from typing import Optional, Dict, Any
 
 def cleanup_port():
     """Kill any existing processes on port 5000"""
@@ -79,6 +80,113 @@ async def test_endpoint():
         "message": "🧪 Test endpoint working perfectly!",
         "timestamp": "2025-01-28"
     }
+
+class AriaChatRequest(pydantic.BaseModel):
+    message: str
+    context: Dict[str, Any] = {}
+
+# Assuming AriaMasterAgent and logger are defined elsewhere in your project
+class AriaMasterAgent:  # Placeholder for the actual AriaMasterAgent class
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def respond(self, message: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        # This is just a dummy implementation. Replace with actual logic.
+        return {"response": f"Echo: {message}", "metadata": context}
+
+class logger: # Placeholder for the actual logger
+    @staticmethod
+    def error(message):
+        print(f"Error: {message}")
+
+@app.post("/aria/chat")
+async def aria_chat(request: AriaChatRequest):
+    """
+    Enhanced Aria Robot chat endpoint with Master Agent coordination
+    """
+    try:
+        # Create Master Agent with enhanced capabilities
+        master_agent = AriaMasterAgent(None, "master-001")
+
+        # Enhanced context for better decision making
+        enhanced_context = {
+            "user_context": request.context,
+            "session": datetime.now().isoformat(),
+            "user_id": request.context.get("user_id", "anonymous"),
+            "conversation_history": request.context.get("history", []),
+            "preferred_language": "persian"
+        }
+
+        # Process message through Master Agent
+        response = master_agent.respond(request.message, enhanced_context)
+
+        return {
+            "success": True,
+            "response": response.get("response", "No response generated"),
+            "agent": "AriaMasterAgent",
+            "metadata": {
+                **response.get("metadata", {}),
+                "task_analysis": response.get("task_analysis", {}),
+                "coordination_plan": response.get("coordination_plan", {}),
+                "agents_used": response.get("coordination_plan", {}).get("agents", []),
+                "execution_time": datetime.now().isoformat()
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Aria chat error: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "fallback_response": "متأسفانه خطایی رخ داده است. لطفاً دوباره تلاش کنید.",
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.get("/aria/status")
+async def aria_system_status():
+    """
+    System status endpoint for monitoring agent health
+    """
+    try:
+        from superagi.agents.aria_agents.aria_controller import AriaController
+
+        controller = AriaController(None)
+        agent_types = [
+            "AriaMasterAgent", "AriaUtilityAgent", "AriaToolAgent", 
+            "AriaMemoryAgent", "AriaSummaryAgent", "AriaGoalAgent", "AriaEmotionAgent"
+        ]
+
+        agent_status = {}
+        for agent_type in agent_types:
+            try:
+                agent = controller.create_agent(agent_type)
+                agent_status[agent_type] = {
+                    "status": "healthy",
+                    "capabilities": agent.get_capabilities() if hasattr(agent, 'get_capabilities') else []
+                }
+            except Exception as e:
+                agent_status[agent_type] = {
+                    "status": "error",
+                    "error": str(e)
+                }
+
+        healthy_agents = len([a for a in agent_status.values() if a["status"] == "healthy"])
+        total_agents = len(agent_status)
+
+        return {
+            "system_status": "healthy" if healthy_agents == total_agents else "degraded",
+            "healthy_agents": f"{healthy_agents}/{total_agents}",
+            "agents": agent_status,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        return {
+            "system_status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 if __name__ == "__main__":
     print("🚀 Starting uvicorn server...")
