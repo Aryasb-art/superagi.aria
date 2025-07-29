@@ -50,7 +50,11 @@ args = "lsof -ti:5000 | xargs -r kill -9"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -c \"import pydantic; print(f'Pydantic version: {pydantic.VERSION}')\""
+args = "python -c \"import pydantic; print(f'🚀 Starting SuperAGI Persian UI Server...')\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"import pydantic; print(f'📦 Pydantic version: {pydantic.VERSION}')\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

@@ -28,11 +28,18 @@ async def root():
         "message": "🎯 SuperAGI Persian UI is running successfully!",
         "status": "✅ healthy",
         "pydantic_version": pydantic.VERSION,
-        "persian_ui_url": "/ui"
+        "persian_ui_url": "/ui",
+        "persian_static_url": "/persian/"
     }
 
 @app.get("/ui")
 async def persian_ui():
+    from fastapi.responses import FileResponse
+    return FileResponse("gui/persian_ui/index.html")
+
+# Add redirect from root to UI
+@app.get("/ui/")
+async def persian_ui_with_slash():
     from fastapi.responses import FileResponse
     return FileResponse("gui/persian_ui/index.html")
 
