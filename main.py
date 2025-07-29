@@ -33,8 +33,8 @@ async def root():
 
 @app.get("/ui")
 async def persian_ui():
-    from fastapi.responses import FileResponse
-    return FileResponse("gui/persian_ui/index.html")
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/persian/")
 
 @app.get("/health")
 async def health():
