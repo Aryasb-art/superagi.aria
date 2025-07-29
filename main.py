@@ -22,9 +22,6 @@ app.add_middleware(
 # Mount Persian UI static files
 app.mount("/persian", StaticFiles(directory="gui/persian_ui", html=True), name="persian_ui")
 
-# Also serve at root level for easier access
-app.mount("/static", StaticFiles(directory="gui/persian_ui", html=True), name="static_files")
-
 @app.get("/")
 async def root():
     return {
