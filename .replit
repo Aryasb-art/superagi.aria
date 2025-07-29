@@ -9,7 +9,7 @@ packages = ["cacert", "cargo", "freetype", "glibcLocales", "libffi", "libiconv",
 run = "uvicorn main:app --host 0.0.0.0 --port 5000"
 
 [workflows]
-runButton = "Persian UI Server Fixed"
+runButton = "Persian UI Fixed Server"
 
 [[workflows.workflow]]
 name = "Aria MVP"
@@ -71,6 +71,31 @@ args = "python -c \"import fastapi; print('FastAPI imported successfully')\""
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+[[workflows.workflow]]
+name = "Persian UI Fixed Server"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = 'pkill -f "uvicorn\|python.*main\.py" || true'
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "lsof -ti:5000 | xargs -r kill -9 || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000
