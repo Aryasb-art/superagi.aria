@@ -22,13 +22,22 @@ app.add_middleware(
 # Mount Persian UI static files
 app.mount("/persian", StaticFiles(directory="gui/persian_ui", html=True), name="persian_ui")
 
+# Also serve at root level for easier access
+app.mount("/static", StaticFiles(directory="gui/persian_ui", html=True), name="static_files")
+
 @app.get("/")
 async def root():
     return {
         "message": "🎯 SuperAGI Persian UI is running successfully!",
         "status": "✅ healthy",
-        "pydantic_version": pydantic.VERSION
+        "pydantic_version": pydantic.VERSION,
+        "persian_ui_url": "/ui"
     }
+
+@app.get("/ui")
+async def persian_ui():
+    from fastapi.responses import FileResponse
+    return FileResponse("gui/persian_ui/index.html")
 
 @app.get("/health")
 async def health():
