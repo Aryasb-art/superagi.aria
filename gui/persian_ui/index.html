@@ -1,326 +1,348 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persian SuperAGI Interface</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Tahoma', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            direction: rtl;
-            color: white;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .form-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            direction: rtl;
-        }
-
-        .form-group textarea {
-            height: 120px;
-            resize: vertical;
-        }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .submit-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .result-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: none;
-        }
-
-        .result-container.show {
-            display: block;
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 18px;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid white;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .success {
-            color: #51cf66;
-            background: rgba(81, 207, 102, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .status-indicator {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .status-online {
-            background: rgba(81, 207, 102, 0.9);
-            color: white;
-        }
-
-        .status-offline {
-            background: rgba(255, 107, 107, 0.9);
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div id="statusIndicator" class="status-indicator status-offline">
-        ❌ در حال اتصال...
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <h1>🤖 رابط فارسی SuperAGI</h1>
-            <p>ایجنت هوشمند خود را با زبان فارسی کنترل کنید</p>
-        </div>
-
-        <div class="form-container">
-            <form id="agentForm">
-                <div class="form-group">
-                    <label for="agentName">نام ایجنت:</label>
-                    <input type="text" id="agentName" name="agentName" placeholder="نام ایجنت خود را وارد کنید" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="agentGoal">هدف ایجنت:</label>
-                    <textarea id="agentGoal" name="agentGoal" placeholder="هدف و وظیفه ایجنت را توضیح دهید" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="agentType">نوع ایجنت:</label>
-                    <select id="agentType" name="agentType">
-                        <option value="research">تحقیقاتی</option>
-                        <option value="writing">نویسندگی</option>
-                        <option value="coding">برنامه‌نویسی</option>
-                        <option value="analysis">تحلیل داده</option>
-                        <option value="general">عمومی</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="maxIterations">حداکثر تکرار:</label>
-                    <input type="number" id="maxIterations" name="maxIterations" value="5" min="1" max="20">
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    🚀 ایجاد و اجرای ایجنت
-                </button>
-            </form>
-        </div>
-
-        <div class="result-container" id="resultContainer">
-            <h3>نتیجه اجرای ایجنت:</h3>
-            <div id="resultContent"></div>
-        </div>
-    </div>
-
-    <script>
-        const statusIndicator = document.getElementById('statusIndicator');
-
-        document.getElementById('agentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const resultContainer = document.getElementById('resultContainer');
-            const resultContent = document.getElementById('resultContent');
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ در حال پردازش...';
-            resultContainer.classList.add('show');
-            resultContent.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>ایجنت در حال اجرا است، لطفاً صبر کنید...</p>
-                </div>
-            `;
-
-            // Get form data
-            const formData = new FormData(this);
-            const agentData = {
-                name: formData.get('agentName'),
-                goal: formData.get('agentGoal'),
-                type: formData.get('agentType'),
-                max_iterations: parseInt(formData.get('maxIterations'))
-            };
-
-            try {
-                // Send request to backend
-                const response = await fetch('/api/agents/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(agentData)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`خطا در ایجاد ایجنت: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-
-                // Show success result
-                resultContent.innerHTML = `
-                    <div class="success">
-                        <h4>✅ ایجنت با موفقیت ایجاد شد!</h4>
-                        <p><strong>شناسه ایجنت:</strong> ${result.agent_id || 'نامشخص'}</p>
-                        <p><strong>وضعیت:</strong> ${result.status || 'ایجاد شده'}</p>
-                        <p><strong>پیام:</strong> ${result.message || 'ایجنت آماده اجرا است'}</p>
-                    </div>
-                `;
-
-                // Reset form
-                this.reset();
-
-            } catch (error) {
-                // Show error
-                resultContent.innerHTML = `
-                    <div class="error">
-                        <h4>❌ خطا در ایجاد ایجنت</h4>
-                        <p>${error.message}</p>
-                        <p>لطفاً مجدداً تلاش کنید یا با پشتیبانی تماس بگیرید.</p>
-                    </div>
-                `;
-            } finally {
-                // Reset button
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 ایجاد و اجرای ایجنت';
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Persian SuperAGI Interface</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
-        });
 
-        // Test connection to backend
-        async function testConnection() {
-            try {
-                const response = await fetch('/ping');
-                if (response.ok) {
-                    console.log('✅ اتصال به سرور برقرار است');
-                    statusIndicator.textContent = '✅ آنلاین';
-                    statusIndicator.className = 'status-indicator status-online';
-                } else {
-                    console.log('⚠️ مشکل در اتصال به سرور');
-                    statusIndicator.textContent = '⚠️ مشکل در اتصال';
+            body {
+                font-family: "Tahoma", Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                direction: rtl;
+                color: white;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .form-container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+                font-size: 1.1em;
+            }
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                width: 100%;
+                padding: 12px;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                background: rgba(255, 255, 255, 0.9);
+                color: #333;
+                direction: rtl;
+            }
+
+            .form-group textarea {
+                height: 120px;
+                resize: vertical;
+            }
+
+            .submit-btn {
+                background: linear-gradient(45deg, #ff6b6b, #feca57);
+                color: white;
+                padding: 15px 30px;
+                border: none;
+                border-radius: 10px;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+                width: 100%;
+                transition: transform 0.3s ease;
+            }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .submit-btn:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .result-container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                display: none;
+            }
+
+            .result-container.show {
+                display: block;
+            }
+
+            .loading {
+                text-align: center;
+                font-size: 18px;
+            }
+
+            .spinner {
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top: 4px solid white;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 20px auto;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .error {
+                color: #ff6b6b;
+                background: rgba(255, 107, 107, 0.1);
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
+            .success {
+                color: #51cf66;
+                background: rgba(81, 207, 102, 0.1);
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
+            .status-indicator {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .status-online {
+                background: rgba(81, 207, 102, 0.9);
+                color: white;
+            }
+
+            .status-offline {
+                background: rgba(255, 107, 107, 0.9);
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="statusIndicator" class="status-indicator status-offline">
+            ❌ در حال اتصال...
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <h1>🤖 رابط فارسی SuperAGI</h1>
+                <p>ایجنت هوشمند خود را با زبان فارسی کنترل کنید</p>
+            </div>
+
+            <div class="form-container">
+                <form id="agentForm">
+                    <div class="form-group">
+                        <label for="agentName">نام ایجنت:</label>
+                        <input
+                            type="text"
+                            id="agentName"
+                            name="agentName"
+                            placeholder="نام ایجنت خود را وارد کنید"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentGoal">هدف ایجنت:</label>
+                        <textarea
+                            id="agentGoal"
+                            name="agentGoal"
+                            placeholder="هدف و وظیفه ایجنت را توضیح دهید"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentType">نوع ایجنت:</label>
+                        <select id="agentType" name="agentType">
+                            <option value="research">تحقیقاتی</option>
+                            <option value="writing">نویسندگی</option>
+                            <option value="coding">برنامه‌نویسی</option>
+                            <option value="analysis">تحلیل داده</option>
+                            <option value="general">عمومی</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxIterations">حداکثر تکرار:</label>
+                        <input
+                            type="number"
+                            id="maxIterations"
+                            name="maxIterations"
+                            value="5"
+                            min="1"
+                            max="20"
+                        />
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        🚀 ایجاد و اجرای ایجنت
+                    </button>
+                </form>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <h3>نتیجه اجرای ایجنت:</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+
+        <script>
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            document.getElementById('agentForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('submitBtn');
+                const resultContainer = document.getElementById('resultContainer');
+                const resultContent = document.getElementById('resultContent');
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ در حال پردازش...';
+                resultContainer.classList.add('show');
+                resultContent.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>ایجنت در حال اجرا است، لطفاً صبر کنید...</p>
+                    </div>
+                `;
+
+                // Get form data
+                const formData = new FormData(this);
+                const agentData = {
+                    name: formData.get('agentName'),
+                    goal: formData.get('agentGoal'),
+                    type: formData.get('agentType'),
+                    max_iterations: parseInt(formData.get('maxIterations'))
+                };
+
+                try {
+                    // Send request to backend
+                    const response = await fetch('/api/agents/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(agentData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`خطا در ایجاد ایجنت: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+
+                    // Show success result
+                    resultContent.innerHTML = `
+                        <div class="success">
+                            <h4>✅ ایجنت با موفقیت ایجاد شد!</h4>
+                            <p><strong>شناسه ایجنت:</strong> ${result.agent_id || 'نامشخص'}</p>
+                            <p><strong>وضعیت:</strong> ${result.status || 'ایجاد شده'}</p>
+                            <p><strong>پیام:</strong> ${result.message || 'ایجنت آماده اجرا است'}</p>
+                        </div>
+                    `;
+
+                    // Reset form
+                    this.reset();
+
+                } catch (error) {
+                    // Show error
+                    resultContent.innerHTML = `
+                        <div class="error">
+                            <h4>❌ خطا در ایجاد ایجنت</h4>
+                            <p>${error.message}</p>
+                            <p>لطفاً مجدداً تلاش کنید یا با پشتیبانی تماس بگیرید.</p>
+                        </div>
+                    `;
+                } finally {
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '🚀 ایجاد و اجرای ایجنت';
+                }
+            });
+
+            // Test connection to backend
+            async function testConnection() {
+                try {
+                    const response = await fetch('/ping');
+                    if (response.ok) {
+                        console.log('✅ اتصال به سرور برقرار است');
+                        statusIndicator.textContent = '✅ آنلاین';
+                        statusIndicator.className = 'status-indicator status-online';
+                    } else {
+                        console.log('⚠️ مشکل در اتصال به سرور');
+                        statusIndicator.textContent = '⚠️ مشکل در اتصال';
+                        statusIndicator.className = 'status-indicator status-offline';
+                    }
+                } catch (error) {
+                    console.log('❌ عدم اتصال به سرور');
+                    statusIndicator.textContent = '❌ آفلاین';
+                    statusIndicator.className = 'status-indicator status-offline';sIndicator.className = 'status-indicator status-offline';
+                    }
+                } catch (error) {
+                    console.log('❌ خطا در اتصال به سرور:', error);
+                    statusIndicator.textContent = '❌ آفلاین';
                     statusIndicator.className = 'status-indicator status-offline';
                 }
-            } catch (error) {
-                console.log('❌ عدم اتصال به سرور');
-                statusIndicator.textContent = '❌ آفلاین';
-                statusIndicator.className = 'status-indicator status-offline';sIndicator.className = 'status-indicator status-offline';
-                }
-            } catch (error) {
-                console.log('❌ خطا در اتصال به سرور:', error);
-                statusIndicator.textContent = '❌ آفلاین';
-                statusIndicator.className = 'status-indicator status-offline';
             }
-        }
 
-        // Test connection on page load and every 30 seconds
-        testConnection();
-        setInterval(testConnection, 30000);
-    </script>
-</body>
+            // Test connection on page load and every 30 seconds
+            testConnection();
+            setInterval(testConnection, 30000);
+        </script>
+    </body>
 </html>
