@@ -189,3 +189,5 @@ fastapi-jwt-auth
 fastapi-jwt-auth
 slack-sdk
 slack-sdk
+markdown
+reportlab
