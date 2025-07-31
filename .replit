@@ -8,3 +8,7 @@ packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt"
 [deployment]
 run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]
 build = ["sh", "-c", "cd gui && npm install && npm run build"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
