@@ -107,7 +107,7 @@ async def aria_chat(request: AriaChatRequest):
     """
     try:
         from superagi.agents.aria_agents.aria_agent_pool import AriaAgentPool
-        
+
         # Initialize global agent pool if not exists
         if not hasattr(app.state, "agent_pool"):
             app.state.agent_pool = AriaAgentPool(max_agents_per_type=5)
@@ -226,7 +226,7 @@ async def get_pool_metrics():
     try:
         if not hasattr(app.state, "agent_pool"):
             return {"error": "Agent pool not initialized"}
-        
+
         metrics = app.state.agent_pool.get_pool_status()
         return {
             "success": True,
@@ -242,16 +242,21 @@ async def get_pool_metrics():
         }
 
 if __name__ == "__main__":
-    print("🚀 Starting uvicorn server...")
+    import uvicorn
+
+    print("🚀 شروع Persian UI Server...")
+    print("📍 آدرس: http://0.0.0.0:5000")
+    print("📁 Static files: /gui/persian_ui/")
+
     try:
         uvicorn.run(
-            "main:app", 
+            app, 
             host="0.0.0.0", 
             port=5000, 
-            reload=False,  # Disable reload to prevent conflicts
+            reload=False,
+            access_log=True,
             log_level="info"
         )
     except Exception as e:
-        print(f"❌ Server error: {e}")
-        cleanup_port()
+        print(f"❌ خطا در راه‌اندازی سرور: {e}")
         sys.exit(1)
