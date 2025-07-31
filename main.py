@@ -8,6 +8,7 @@ import uvicorn
 import pydantic
 from datetime import datetime
 from typing import Optional, Dict, Any
+import logging
 
 def cleanup_port():
     """Kill any existing processes on port 5000"""
@@ -232,9 +233,10 @@ async def get_pool_metrics():
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
+        logging.exception("Exception occurred in /aria/pool/metrics endpoint")
         return {
             "success": False,
-            "error": str(e),
+            "error": "An internal error has occurred.",
             "timestamp": datetime.now().isoformat()
         }
 
