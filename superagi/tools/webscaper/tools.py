@@ -24,8 +24,8 @@ class WebScraperTool(BaseTool):
         args_schema : The args schema.
     """
     llm: Optional[BaseLlm] = None
-    name = "WebScraperTool"
-    description = (
+    name: str = "WebScraperTool"
+    description: str = (
         "Used to scrape website urls and extract text content"
     )
     args_schema: Type[WebScraperSchema] = WebScraperSchema
