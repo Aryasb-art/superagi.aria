@@ -211,9 +211,10 @@ async def aria_system_status():
         }
 
     except Exception as e:
+        logging.exception("Exception occurred in /aria/status endpoint")
         return {
             "system_status": "error",
-            "error": str(e),
+            "error": "An internal error has occurred.",
             "timestamp": datetime.now().isoformat()
         }
 
