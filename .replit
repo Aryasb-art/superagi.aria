@@ -104,10 +104,6 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -c \"import fastapi, starlette, uvicorn; print('✅ Dependencies OK')\""
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
 args = "python main.py"
 
 [[ports]]
