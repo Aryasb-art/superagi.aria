@@ -601,6 +601,17 @@
             setTypingState(false);
         }
 
+        // تابع امن‌سازی HTML برای جلوگیری از XSS
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/\//g, '&#x2F;');
+        }
+
         // تابع اضافه کردن پیام
         function addMessage(type, content, agentType = '') {
             const timestamp = new Date().toLocaleTimeString('fa-IR');
@@ -616,27 +627,31 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `${type}-message`;
 
+            // Escape user-controlled content before inserting into innerHTML
+            const safeContent = escapeHTML(content);
+            const safeAgentType = escapeHTML(agentType);
+
             if (type === 'user') {
                 messageDiv.innerHTML = `
                     <div class="message-avatar">👤</div>
                     <div>
-                        <div class="message-content">${content}</div>
+                        <div class="message-content">${safeContent}</div>
                         <div class="message-time">${timestamp}</div>
                     </div>
                 `;
             } else if (type === 'bot') {
-                const agentInfo = agentType ? ` (${agentType})` : '';
+                const agentInfo = agentType ? ` (${safeAgentType})` : '';
                 messageDiv.innerHTML = `
                     <div class="message-avatar">🤖</div>
                     <div>
-                        <div class="message-content">${content}</div>
+                        <div class="message-content">${safeContent}</div>
                         <div class="message-time">Aria${agentInfo} - ${timestamp}</div>
                     </div>
                 `;
             } else if (type === 'error') {
                 messageDiv.innerHTML = `
                     <div class="error-message">
-                        ❌ ${content}
+                        ❌ ${safeContent}
                         <div class="message-time">${timestamp}</div>
                     </div>
                 `;
