@@ -190,3 +190,4 @@ slack-sdk
 slack-sdk
 markdown
 reportlab
+pydantic-settings
