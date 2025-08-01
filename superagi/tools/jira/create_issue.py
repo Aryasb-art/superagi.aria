@@ -21,8 +21,8 @@ class CreateIssueTool(JiraTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "CreateJiraIssue"
-    description = "Create a new Jira issue."
+    name: str = "CreateJiraIssue"
+    description: str = "Create a new Jira issue."
     args_schema: Type[CreateIssueSchema] = CreateIssueSchema
 
     def _execute(self, fields: dict):

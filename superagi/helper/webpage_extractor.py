@@ -1,6 +1,8 @@
 from io import BytesIO
-from PyPDF2 import PdfFileReader
-from PyPDF2 import PdfReader
+try:
+    from PyPDF2 import PdfReader
+except ImportError:
+    PdfReader = None
 import requests
 import re
 from requests.exceptions import RequestException
@@ -50,9 +52,12 @@ class WebpageExtractor:
                 response = requests.get(url)
                 response.raise_for_status()
 
+                if PdfReader is None:
+                    return "PDF processing not available - PyPDF2 not installed"
+                
                 with BytesIO(response.content) as pdf_data:
                     reader = PdfReader(pdf_data)
-                    content = " ".join([reader.getPage(i).extract_text() for i in range(reader.getNumPages())])
+                    content = " ".join([page.extract_text() for page in reader.pages])
 
             else:
                 config = Config()

@@ -1,0 +1,49 @@
+
+agent_name: "AriaGoalAgent"
+agent_description: "Advanced goal and intent detection system with pattern recognition and goal inference capabilities"
+agent_type: "goal_analysis"
+version: "1.0.0"
+
+capabilities:
+  - "goal_detection"
+  - "intent_analysis"
+  - "goal_planning"
+  - "motivation_assessment"
+  - "behavioral_analysis"
+  - "pattern_recognition"
+  - "goal_tracking"
+
+configuration:
+  max_goal_history: 500
+  confidence_threshold: 0.6
+  pattern_matching_sensitivity: 0.7
+  goal_completion_tracking: true
+  intent_categorization: true
+
+dependencies:
+  - "base_aria_agent"
+  - "logger"
+  - "datetime"
+
+resources:
+  memory_usage: "medium"
+  cpu_usage: "medium"
+  priority: "high"
+
+goal_categories:
+  - "action/initiation"
+  - "decision/choice"
+  - "concern/worry"
+  - "motivation/energy"
+  - "confusion/help"
+  - "planning/organization"
+  - "learning/knowledge"
+  - "health/wellness"
+  - "relationship/social"
+  - "career/work"
+  - "general/other"
+
+confidence_levels:
+  - "high"
+  - "medium"
+  - "low"

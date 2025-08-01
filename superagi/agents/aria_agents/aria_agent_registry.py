@@ -4,6 +4,10 @@ from superagi.agents.aria_agents.base_aria_agent import BaseAriaAgent
 from superagi.agents.aria_agents.aria_utility_agent.aria_utility_agent import AriaUtilityAgent
 from superagi.agents.aria_agents.aria_tool_agent.aria_tool_agent import AriaToolAgent
 from superagi.agents.aria_agents.aria_memory_agent.aria_memory_agent import AriaMemoryAgent
+from superagi.agents.aria_agents.aria_summary_agent.aria_summary_agent import AriaSummaryAgent
+from superagi.agents.aria_agents.aria_master_agent.aria_master_agent import AriaMasterAgent
+from superagi.agents.aria_agents.aria_emotion_agent.aria_emotion_agent import AriaEmotionAgent
+from superagi.agents.aria_agents.aria_goal_agent.aria_goal_agent import AriaGoalAgent
 from superagi.lib.logger import logger
 
 class AriaAgentRegistry:
@@ -15,6 +19,10 @@ class AriaAgentRegistry:
         "AriaUtilityAgent": AriaUtilityAgent,
         "AriaToolAgent": AriaToolAgent,
         "AriaMemoryAgent": AriaMemoryAgent,
+        "AriaSummaryAgent": AriaSummaryAgent,
+        "AriaMasterAgent": AriaMasterAgent,
+        "AriaEmotionAgent": AriaEmotionAgent,
+        "AriaGoalAgent": AriaGoalAgent,
     }
     
     _capability_map: Dict[str, List[str]] = {}
@@ -26,7 +34,7 @@ class AriaAgentRegistry:
         cls._agents[agent_type] = agent_class
         
         # Create temporary instance to get capabilities
-        temp_instance = agent_class(None, 0)
+        temp_instance = agent_class(None, 0, {})
         capabilities = temp_instance.get_capabilities()
         
         for capability in capabilities:
@@ -62,7 +70,7 @@ class AriaAgentRegistry:
         """Initialize the registry with all agents"""
         for agent_class in cls._agents.values():
             try:
-                temp_instance = agent_class(None, 0)
+                temp_instance = agent_class(None, 0, {})
                 capabilities = temp_instance.get_capabilities()
                 
                 for capability in capabilities:

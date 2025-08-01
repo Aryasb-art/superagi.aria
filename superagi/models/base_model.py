@@ -4,6 +4,8 @@ from sqlalchemy import Column, DateTime, INTEGER
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
 
+from pydantic import ConfigDict
+
 Base = declarative_base()
 
 
@@ -66,3 +68,9 @@ class DBBaseModel(Base):
                 A string with the format "<Class Name> (<dictionary representation of the object>)".
         """
         return f"{self.__class__.__name__} ({self.to_dict()})"
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        arbitrary_types_allowed=True,
+        extra="forbid"
+    )

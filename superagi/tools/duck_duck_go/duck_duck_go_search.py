@@ -35,20 +35,18 @@ class DuckDuckGoSearchTool(BaseTool):
         args_schema : The args schema.
     """
     llm: Optional[BaseLlm] = None
-    name = "DuckDuckGoSearch"
-    agent_id: int = None
-    agent_execution_id: int = None
-    description = (
-        "A tool for performing a DuckDuckGo search and extracting snippets and webpages."
-        "Input should be a search query."
+    name: str = "DuckDuckGoSearch"
+    description: str = (
+        "A wrapper around DuckDuckGo Search. "
+        "Useful for when you need to answer questions about current events. "
+        "Always one of the first options when you need to find information on internet"
     )
     args_schema: Type[DuckDuckGoSearchSchema] = DuckDuckGoSearchSchema
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = {"arbitrary_types_allowed": True}
 
     def _execute(self, query: str) -> tuple:
-        
+
         """
         Execute the DuckDuckGo search tool.
 
@@ -61,14 +59,14 @@ class DuckDuckGoSearchTool(BaseTool):
 
         search_results = self.get_raw_duckduckgo_results(query)
         links=[]                                                                        
-        
+
         for result in search_results:                                                       
             links.append(result["href"])
-        
+
         webpages=self.get_content_from_url(links)
 
         results=self.get_formatted_webpages(search_results,webpages)                        #array to store objects with keys :{"title":snippet , "body":webpage content, "links":link URL}
-        
+
         summary = self.summarise_result(query, results)                                     #summarize the content gathered using the function
         links = [result["links"] for result in results if len(result["links"]) > 0]
 
@@ -91,7 +89,7 @@ class DuckDuckGoSearchTool(BaseTool):
 
         results=[]                                                                          #array to store objects with keys :{"title":snippet , "body":webpage content, "links":link URL}
         i = 0
-        
+
         for webpage in webpages:
             results.append({"title": search_results[i]["title"], "body": webpage, "links": search_results[i]["href"]})
             i += 1
@@ -111,7 +109,7 @@ class DuckDuckGoSearchTool(BaseTool):
         """
 
         webpages=[]                                                                         #webpages array for storing the contents extracted from the links
-        
+
         if links:
             for i in range(0, MAX_LINKS_TO_SCRAPE):                                         #using first 3 (Value of MAX_LINKS_TO_SCRAPE) links
                 time.sleep(3)
@@ -150,7 +148,7 @@ class DuckDuckGoSearchTool(BaseTool):
 
             # time.sleep(1)
             attempts += 1
-        
+
         return search_results
 
     def summarise_result(self, query, snippets):
@@ -174,7 +172,7 @@ class DuckDuckGoSearchTool(BaseTool):
 
         messages = [{"role": "system", "content": summarize_prompt}]
         result = self.llm.chat_completion(messages, max_tokens=self.max_token_limit)
-        
+
         if 'error' in result and result['message'] is not None:
             ErrorHandler.handle_openai_errors(self.toolkit_config.session, self.agent_id, self.agent_execution_id, result['message'])
         return result["content"]

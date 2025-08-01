@@ -17,8 +17,8 @@ class GetProjectsTool(JiraTool):
         description : The description.
         args_schema : The args schema.
     """
-    name = "GetJiraProjects"
-    description = "This tool is a wrapper around atlassian-python-api's Jira project API. Useful in fetching all the projects accessible to the user, discovering the total count of projects, or utilizing it as an interim step during project-based searches."
+    name: str = "GetJiraProjects"
+    description: str = "This tool is a wrapper around atlassian-python-api's Jira project API. Useful in fetching all the projects accessible to the user, discovering the total count of projects, or utilizing it as an interim step during project-based searches."
     args_schema: Type[GetProjectsSchema] = GetProjectsSchema
 
     def parse_projects(self, projects: List[dict]) -> List[dict]:

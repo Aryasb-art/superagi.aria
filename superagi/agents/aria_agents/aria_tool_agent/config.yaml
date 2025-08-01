@@ -1,21 +1,43 @@
 
-agent_type: "AriaToolAgent"
-name: "Aria Tool Agent"
-description: "Handles tool management and execution for AriaRobot"
+name: "AriaToolAgent"
+description: "Advanced task processing agent with comprehensive tool capabilities"
+version: "1.0.0"
+author: "SuperAGI"
+
 capabilities:
+  - task_execution
   - tool_management
-  - tool_execution
+  - workflow_processing
+  - data_transformation
   - api_integration
+  - file_processing
   - automation
+  - system_integration
+
+parameters:
+  max_workflow_steps: 20
+  default_timeout: 300
+  enable_parallel_execution: true
+
+dependencies:
+  - base_aria_agent
+
+task_types:
   - workflow
-default_config:
-  max_iterations: 100
-  memory_window: 15
-  permission_type: "God Mode"
-tools:
-  - "file"
-  - "thinking"
-  - "code"
-constraints:
-  - "Validate tool permissions before execution"
-  - "Log all tool operations for audit"
+  - data_processing
+  - api_call
+  - file_operation
+  - automation
+
+input_types:
+  - task_definition
+  - workflow_steps
+  - api_config
+  - file_path
+  - automation_script
+
+output_formats:
+  - execution_result
+  - workflow_output
+  - api_response
+  - file_operation_result

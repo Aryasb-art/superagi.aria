@@ -25,27 +25,13 @@ class CodingSchema(BaseModel):
 
 class CodingTool(BaseTool):
     """
-    Used to generate code.
-
-    Attributes:
-        llm: LLM used for code generation.
-        name : The name of tool.
-        description : The description of tool.
-        args_schema : The args schema.
-        goals : The goals.
-        resource_manager: Manages the file resources
+    Used to generate code
     """
+    name: str = "CodingTool"
+    description: str = "You will be given an objective, and an empty file where you need to write a code for a given objective. Analyze the objective and write code in the file."
     llm: Optional[BaseLlm] = None
     agent_id: int = None
     agent_execution_id: int = None
-    name = "CodingTool"
-    description = (
-        "You will get instructions for code to write. You will write a very long answer. "
-        "Make sure that every detail of the architecture is, in the end, implemented as code. "
-        "Think step by step and reason yourself to the right decisions to make sure we get it right. "
-        "You will first lay out the names of the core classes, functions, methods that will be necessary, "
-        "as well as a quick comment on their purpose. Then you will output the content of each file including each function and class and ALL code."
-    )
     args_schema: Type[CodingSchema] = CodingSchema
     goals: List[str] = []
     resource_manager: Optional[FileManager] = None
@@ -79,7 +65,7 @@ class CodingTool(BaseTool):
         token_limit = TokenCounter(session=self.toolkit_config.session, organisation_id=organisation.id).token_limit(self.llm.get_model())
 
         result = self.llm.chat_completion(messages, max_tokens=(token_limit - total_tokens - 100))
-        
+
         if 'error' in result and result['message'] is not None:
             ErrorHandler.handle_openai_errors(self.toolkit_config.session, self.agent_id, self.agent_execution_id, result['message'])
 

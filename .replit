@@ -1,14 +1,105 @@
 modules = ["python-3.12", "nodejs-20", "web", "bash"]
-run = "python main.py"
+run = "uvicorn main:app --host 0.0.0.0 --port 5000"
 
 [nix]
 channel = "stable-24_05"
-packages = ["cacert", "cargo", "glibcLocales", "libffi", "libiconv", "libxcrypt", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
+packages = ["cacert", "cargo", "freetype", "glibcLocales", "libffi", "libiconv", "libxcrypt", "lsof", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
 
 [deployment]
-run = ["sh", "-c", "cd gui && node .next/standalone/server.js"]
-build = ["sh", "-c", "cd gui && npm install && npm run build"]
+run = "uvicorn main:app --host 0.0.0.0 --port 5000"
+
+[workflows]
+runButton = "Persian UI Fixed Server"
+
+[[workflows.workflow]]
+name = "Aria MVP"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python aria_mvp_runner.py --mode interactive"
+
+[[workflows.workflow]]
+name = "Persian UI Server"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+[[workflows.workflow]]
+name = "Aria MVP Fixed"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python aria_mvp_runner.py --mode interactive"
+
+[[workflows.workflow]]
+name = "Persian UI Server Fixed"
+author = 44656348
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "lsof -ti:5000 | xargs -r kill -9"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"import pydantic; print(f'Pydantic version: {pydantic.VERSION}')\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
+
+[[workflows.workflow]]
+name = "Test Fixed FastAPI"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"import pydantic; print(f'Pydantic version: {pydantic.VERSION}')\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"import fastapi; print('FastAPI imported successfully')\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+[[workflows.workflow]]
+name = "Persian UI Fixed Server"
+author = 44656348
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = 'pkill -f "uvicorn\|python.*main\.py" || true'
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "lsof -ti:5000 | xargs -r kill -9 || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8000
