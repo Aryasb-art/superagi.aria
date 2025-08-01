@@ -486,3 +486,65 @@ class AriaSummaryAgent(BaseAriaAgent):
                 "agent": self.get_agent_type(),
                 "timestamp": datetime.utcnow().isoformat()
             }
+from typing import Dict, Any, List
+from superagi.agents.aria_agents.base_aria_agent import BaseAriaAgent
+from superagi.llms.base_llm import BaseLlm
+
+
+class AriaSummaryAgent(BaseAriaAgent):
+    """
+    Aria Summary Agent for generating summaries
+    """
+    
+    def __init__(self, llm: BaseLlm, **kwargs):
+        super().__init__(llm=llm, **kwargs)
+        self.agent_type = "summary"
+    
+    def execute(self, task: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Execute summary task
+        """
+        try:
+            prompt = f"""
+            Please provide a concise summary of the following content:
+            
+            {task}
+            
+            Summary:
+            """
+            
+            response = self.llm.chat_completion([{"role": "user", "content": prompt}])
+            
+            return {
+                "success": True,
+                "summary": response,
+                "agent_type": self.agent_type
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "agent_type": self.agent_type
+            }
+    
+    def get_capabilities(self) -> List[str]:
+        """
+        Return agent capabilities
+        """
+        return [
+            "text_summarization",
+            "content_analysis", 
+            "key_points_extraction"
+        ]
+    
+    @classmethod
+    def get_agent_config(cls) -> Dict[str, Any]:
+        """
+        Return agent configuration
+        """
+        return {
+            "name": "AriaSummaryAgent",
+            "description": "Agent for generating summaries and extracting key points",
+            "capabilities": ["text_summarization", "content_analysis"],
+            "version": "1.0.0"
+        }
