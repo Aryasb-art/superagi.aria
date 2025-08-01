@@ -6,10 +6,10 @@ channel = "stable-24_05"
 packages = ["cacert", "cargo", "freetype", "glibcLocales", "libffi", "libiconv", "libxcrypt", "lsof", "openssl", "pkg-config", "postgresql", "rdkafka", "rustc", "xcodebuild", "zlib"]
 
 [deployment]
-run = "uvicorn main:app --host 0.0.0.0 --port 5000"
+run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Persian UI Fixed Server"
+runButton = "Production Server"
 
 [[workflows.workflow]]
 name = "Aria MVP"
@@ -92,6 +92,15 @@ args = "lsof -ti:5000 | xargs -r kill -9 || true"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
+
+[[workflows.workflow]]
+name = "Production Server"
+author = 44656348
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
