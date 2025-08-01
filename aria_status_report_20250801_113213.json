@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-01T11:32:13.402418",
+  "overall_score": 50.0,
+  "results": {
+    "agents": {
+      "error": "`BaseSettings` has been moved to the `pydantic-settings` package. See https://docs.pydantic.dev/2.11/migration/#basesettings-has-moved-to-pydantic-settings for more details.\n\nFor further information visit https://errors.pydantic.dev/2.11/u/import-error"
+    },
+    "dependencies": {
+      "installed": [
+        "openai",
+        "slack_sdk",
+        "pydantic",
+        "sqlalchemy",
+        "uvicorn",
+        "fastapi",
+        "reportlab"
+      ],
+      "missing": [],
+      "total": 7
+    },
+    "database": {
+      "status": "error",
+      "error": "`BaseSettings` has been moved to the `pydantic-settings` package. See https://docs.pydantic.dev/2.11/migration/#basesettings-has-moved-to-pydantic-settings for more details.\n\nFor further information visit https://errors.pydantic.dev/2.11/u/import-error"
+    },
+    "servers": {
+      "persian_ui": "stopped"
+    },
+    "files": {
+      "existing": [
+        "aria_mvp_runner.py",
+        "main.py",
+        "superagi/agents/aria_agents/aria_controller.py",
+        "superagi/agents/aria_agents/base_aria_agent.py",
+        "superagi/tools/base_tool.py"
+      ],
+      "missing": [],
+      "total": 5
+    }
+  },
+  "recommendations": [
+    "🔧 برخی ایجنت‌ها نیاز به تعمیر دارند",
+    "🗄️ بررسی تنظیمات دیتابیس",
+    "🌐 راه‌اندازی Persian UI Server"
+  ]
+}
